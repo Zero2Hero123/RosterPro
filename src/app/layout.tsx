@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Schedule Maker",
+  title: "RosterPro",
   description: "Business Solution",
 };
 
@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className + " bg-[#070F2B] text-white"}>{children}</body>
+      <body className={inter.className + " bg-[#121212] text-white"}>{children}</body>
     </html>
   );
 }
