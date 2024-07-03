@@ -10,45 +10,60 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 
+// TODO handle undefined error with job-percentage rendering
 
+type Jobs = Record<string,number>
 
-type Jobs = {
-    [key: string]: number
-}
-
-type PercentagesMap = {
-    [key: string]: Jobs
-}
+export type PercentagesMap = Record<string,Jobs>
 
 type JobPercentagesReducer = (percentages: PercentagesMap,action:{prop: string, propType: 'name' | 'job', type: 'add' | 'remove',names: string[], jobs: string[]}) => PercentagesMap
 
 const reducer: JobPercentagesReducer = (percentages,action) => {
+
+    console.info('ACTION ',action)
 
     const jobMap: Jobs = {}
     for(let job of action.jobs){
         jobMap[job] = 100
     }
 
-
-    const newMap: PercentagesMap = new Object(percentages) as PercentagesMap
-
     if(action.propType == 'name'){
         if(action.type == 'add'){
-            newMap[action.prop] = new Object(jobMap) as Jobs
+            
+            return {
+                ...percentages,
+                [action.prop]: new Object(jobMap) as Jobs
+            }    
         } else if(action.type == 'remove'){
+            let newMap = new Object(percentages) as PercentagesMap
+            
             delete newMap[action.prop]
+
+            return newMap;
         }
 
     } else if(action.propType == 'job'){
+        
         if(action.type == 'add'){
-            action.names.forEach(name => newMap[name][action.prop] = 100)
+            console.log('add HERE')
+            const newMap = new Object(percentages) as PercentagesMap
+            for(let name of action.names){
+                newMap[name] = {
+                    ...jobMap, [action.prop]: 100
+                }
+            }
+            return newMap;
         
         } else if(action.type == 'remove'){
-            action.names.forEach(name => delete newMap[name][action.prop])
+            const newMap = new Object(percentages) as PercentagesMap
+            for(let name of action.names){
+                delete newMap[name][action.prop]
+            }
+            return newMap;
         }
     }
 
-    return newMap;
+    return percentages;
 }
 
 export default function Scheduler(){
@@ -167,15 +182,15 @@ export default function Scheduler(){
                                 <SelectTrigger className="bg-black">
                                     <SelectValue  placeholder="People"/>
                                 </SelectTrigger>
-                                <SelectContent className="bg-black">
+                                <SelectContent className="bg-black text-white">
                                     {names.map(n => <SelectItem key={n} value={n}>{n}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="flex justify-center w-[80%]">
-                            {jobs.length > 0 ? <div>
-                                {jobs.map(j => <JobParameter key={selectedPerson+j} jobName={j} percentage={percentages[selectedPerson][j]} />)}
-                            </div> : <span>No Jobs added</span>}
+                        <div className="flex flex-col justify-center w-[80%]">
+                            {jobs.length > 0 && advancedEnabled ? <div className="flex flex-col text-center gap-3">
+                                {jobs.map((j,v) => <JobParameter isEnabled key={selectedPerson+j}  jobName={j} personName={selectedPerson} percentages={percentages} />)}
+                            </div> : <span className="text-center">Select a Person</span>}
                         </div>
                         <div>
                             <span className="">Enabled?</span> <Checkbox onCheckedChange={e => setAdvancedEnabled(e.valueOf() as boolean)} className=""/>
