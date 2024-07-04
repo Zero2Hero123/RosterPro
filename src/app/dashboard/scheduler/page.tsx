@@ -18,8 +18,6 @@ import { CalendarIcon, Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { DateRange } from "react-day-picker";
 
-// TODO Establish state of job-percent accessible in parent
-
 type Jobs = Record<string,number>
 
 export type PercentagesMap = Record<string,Jobs>
@@ -98,6 +96,10 @@ const reducer: JobPercentagesReducer = (percentages,action) => {
     return percentages;
 }
 
+
+type Day = 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday'
+type DaysMap = Record<Day,boolean>
+type ToggleAction = { day: Day, newVal: boolean }
 export default function Scheduler(){
 
     const nameInputRef = useRef<HTMLInputElement>(null)
@@ -114,10 +116,35 @@ export default function Scheduler(){
 
     const [selectedPerson,setSelectedPerson] = useState('')
 
+
+    // DATES
     const [selectedRange,setDate] = useState<DateRange | undefined>({
         from: new Date(),
         to: addDays(new Date(),30)
     })
+
+    const [selectedDays,setDays] = useState<DaysMap>({
+        sunday: true,
+        monday: true,
+        tuesday: true,
+        wednesday: true,
+        thursday: true,
+        friday: true,
+        saturday: true
+    })
+
+    function updateDay(dayInfo: {day: Day, newVal: boolean}){
+        console.log(dayInfo)
+        setDays(prev => {
+            let dayMap = new Object(prev) as DaysMap
+
+            dayMap[dayInfo.day] = dayInfo.newVal
+
+            return dayMap
+        })
+
+        forceUpdate()
+    }
 
     const [advancedEnabled,setAdvancedEnabled] = useState<boolean>(false)
 
@@ -127,8 +154,9 @@ export default function Scheduler(){
     const [percentages,dispatch] = useReducer(reducer,{})
 
     useEffect(() => {
-        console.log(percentages)
-    ,[percentages]})
+        
+        console.log(selectedDays)
+    ,[selectedDays]})
     
     function removeName(name: string){
 
@@ -240,13 +268,13 @@ export default function Scheduler(){
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent className="bg-black text-white">
-                            <DropdownMenuCheckboxItem checked={true}>Sunday</DropdownMenuCheckboxItem>
-                            <DropdownMenuCheckboxItem>Monday</DropdownMenuCheckboxItem>
-                            <DropdownMenuCheckboxItem>Tuesday</DropdownMenuCheckboxItem>
-                            <DropdownMenuCheckboxItem>Wednesday</DropdownMenuCheckboxItem>
-                            <DropdownMenuCheckboxItem>Thursday</DropdownMenuCheckboxItem>
-                            <DropdownMenuCheckboxItem>Friday</DropdownMenuCheckboxItem>
-                            <DropdownMenuCheckboxItem>Saturday</DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem onCheckedChange={(v) => updateDay({day: 'sunday', newVal: v})} checked={selectedDays.sunday}>Sunday</DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem onCheckedChange={(v) => updateDay({day: 'monday', newVal: v})} checked={selectedDays.monday}>Monday</DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem onCheckedChange={(v) => updateDay({day: 'tuesday', newVal: v})} checked={selectedDays.tuesday}>Tuesday</DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem onCheckedChange={(v) => updateDay({day: 'wednesday', newVal: v})} checked={selectedDays.wednesday}>Wednesday</DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem onCheckedChange={(v) => updateDay({day: 'thursday', newVal: v})} checked={selectedDays.thursday}>Thursday</DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem onCheckedChange={(v) => updateDay({day: 'friday', newVal: v})} checked={selectedDays.friday}>Friday</DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem onCheckedChange={(v) => updateDay({day: 'saturday', newVal: v})} checked={selectedDays.saturday}>Saturday</DropdownMenuCheckboxItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
