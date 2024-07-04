@@ -1,5 +1,6 @@
 'use client'
 
+import Document from "@/components/Document";
 import JobParameter from "@/components/JobParameter";
 import ParamController from "@/components/ParamController";
 import Segment from "@/components/Segment";
@@ -154,9 +155,9 @@ export default function Scheduler(){
     return (<>
     
         <main>
-            <span className="flex justify-center text-3xl font-medium">Person-Job Scheduler</span>
+            <span className="flex justify-center text-3xl font-medium print:hidden">Person-Job Scheduler</span>
             
-            <header className="flex justify-center gap-2 flex-wrap ">
+            <header className="flex justify-center gap-2 flex-wrap print:hidden">
                 <ParamController title="People">
                     <div className="flex gap-2 px-2">
                         <Input onKeyDown={e => e.key == 'Enter' && addNameBtnRef.current?.click()} ref={nameInputRef} className="bg-black" onChange={e => setEnteredName(e.target.value)} placeholder="Name" />
@@ -225,6 +226,17 @@ export default function Scheduler(){
                     </div>
                 </ParamController>
             </header>
+
+            <section className="flex justify-center gap-3 my-10 print:hidden">
+                <Button className="bg-white text-black hover:bg-slate-200 hover:text-black">Create Preset</Button>
+                <Button className="bg-white text-black hover:bg-slate-200 hover:text-black">Generate</Button>
+                <Button onClick={() => window.print()} className="bg-white text-black hover:bg-slate-200 hover:text-black">Print</Button>
+            </section>
+
+            <section className="flex justify-center flex-wrap">
+                <Document/>
+                <Document/>
+            </section>
         </main>
     
     </>)

@@ -9,7 +9,7 @@ const Navbar: React.FC = () => {
 
 
     return (
-        <nav className="bg-black h-16 flex items-center mb-4">
+        <nav className="bg-black h-16 flex items-center mb-4 print:hidden">
             <Link href='/'><Image className="" src={logo} alt='logo' width={60} height={60} /></Link>
             <div></div>
         </nav>
