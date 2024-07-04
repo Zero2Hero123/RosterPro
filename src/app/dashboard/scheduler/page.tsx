@@ -10,21 +10,45 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 
-// TODO handle undefined error with job-percentage rendering
+// TODO Establish state of job-percent accessible in parent
 
 type Jobs = Record<string,number>
 
 export type PercentagesMap = Record<string,Jobs>
 
-type JobPercentagesReducer = (percentages: PercentagesMap,action:{prop: string, propType: 'name' | 'job', type: 'add' | 'remove',names: string[], jobs: string[]}) => PercentagesMap
+export type Action = {
+    prop: string,
+    propType: 'name' | 'job',
+    type: 'add' | 'remove'
+    names: string[],
+    jobs: string[]
+}
+
+export type SetAction = Omit<Action,'names' | 'jobs' | 'type'> & {
+    percentValue: number,
+    forName: string
+    type: 'set-job'
+}
+
+type JobPercentagesReducer = (percentages: PercentagesMap,action: Action | SetAction) => PercentagesMap
 
 const reducer: JobPercentagesReducer = (percentages,action) => {
 
-    console.info('ACTION ',action)
+    // console.info('ACTION ',action)
 
     const jobMap: Jobs = {}
-    for(let job of action.jobs){
-        jobMap[job] = 100
+    if(action.type != 'set-job'){
+        for(let job of action.jobs){
+            jobMap[job] = 100
+        }
+    }
+
+    if(action.type == 'set-job'){
+        const newMap = new Object(percentages) as PercentagesMap
+
+        newMap[action.forName][action.prop] = action.percentValue;
+
+        return newMap;
     }
 
     if(action.propType == 'name'){
@@ -96,12 +120,10 @@ export default function Scheduler(){
     function removeName(name: string){
 
         const newNames = names.copyWithin(0,0)
-        console.log('before: ',newNames)
 
         const idx = newNames.indexOf(name)
 
         newNames.splice(idx,1)
-        console.log('after: ',newNames)
 
         setNames(newNames)
         dispatch({prop: name, propType: 'name',type: 'remove',names: names,jobs: jobs})
@@ -120,6 +142,11 @@ export default function Scheduler(){
         dispatch({prop: job, propType: 'job',type: 'remove',names: names,jobs: jobs})
         forceUpdate()
 
+    }
+
+    function updatePercentages(props: {percent: number,forName: string,job: string}){
+        forceUpdate()
+        dispatch({prop: props.job, propType: 'job',type: 'set-job',percentValue: props.percent,forName: props.forName})
     }
 
 
@@ -189,7 +216,7 @@ export default function Scheduler(){
                         </div>
                         <div className="flex flex-col justify-center w-[80%]">
                             {jobs.length > 0 && advancedEnabled ? <div className="flex flex-col text-center gap-3">
-                                {jobs.map((j,v) => <JobParameter isEnabled key={selectedPerson+j}  jobName={j} personName={selectedPerson} percentages={percentages} />)}
+                                {jobs.map((j,v) => <JobParameter update={updatePercentages}  isEnabled key={selectedPerson+j}  jobName={j} personName={selectedPerson} percentages={percentages} />)}
                             </div> : <span className="text-center">Select a Person</span>}
                         </div>
                         <div>
