@@ -5,11 +5,18 @@ import JobParameter from "@/components/JobParameter";
 import ParamController from "@/components/ParamController";
 import Segment from "@/components/Segment";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import generate from "@/utils/actions";
+import { addDays, format } from "date-fns";
+import { CalendarIcon, Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { DateRange } from "react-day-picker";
 
 // TODO Establish state of job-percent accessible in parent
 
@@ -52,7 +59,7 @@ const reducer: JobPercentagesReducer = (percentages,action) => {
         return newMap;
     }
 
-    if(action.propType == 'name'){
+    if(action.propType == 'name' && action.prop.length > 0){
         if(action.type == 'add'){
             
             return {
@@ -67,7 +74,7 @@ const reducer: JobPercentagesReducer = (percentages,action) => {
             return newMap;
         }
 
-    } else if(action.propType == 'job'){
+    } else if(action.propType == 'job' && action.prop.length > 0){
         
         if(action.type == 'add'){
             console.log('add HERE')
@@ -106,6 +113,11 @@ export default function Scheduler(){
     const [enteredJob,setEnteredJob] = useState<string>('')
 
     const [selectedPerson,setSelectedPerson] = useState('')
+
+    const [selectedRange,setDate] = useState<DateRange | undefined>({
+        from: new Date(),
+        to: addDays(new Date(),30)
+    })
 
     const [advancedEnabled,setAdvancedEnabled] = useState<boolean>(false)
 
@@ -161,13 +173,13 @@ export default function Scheduler(){
                 <ParamController title="People">
                     <div className="flex gap-2 px-2">
                         <Input onKeyDown={e => e.key == 'Enter' && addNameBtnRef.current?.click()} ref={nameInputRef} className="bg-black" onChange={e => setEnteredName(e.target.value)} placeholder="Name" />
-                        <Button ref={addNameBtnRef} className="bg-gray-800" onClick={() => {
+                        <Button ref={addNameBtnRef} className="bg-white text-black" onClick={() => {
                             dispatch({prop: enteredName, propType: 'name',type: 'add',names: names,jobs: jobs})
 
                             setNames(prev => {
                             if(nameInputRef.current) nameInputRef.current.value = ''
                             return [...prev,enteredName]
-                        });}}>Add</Button>
+                        });}}> <Plus/> </Button>
                     </div>
                 
                     
@@ -179,16 +191,16 @@ export default function Scheduler(){
 
                 </ParamController>
 
-                <ParamController title="Job">
+                <ParamController title="Jobs">
                     <div className="flex gap-2 px-2">
                         <Input onKeyDown={e => e.key == 'Enter' && addJobBtn.current?.click()} ref={jobInputRef} className="bg-black" onChange={e => setEnteredJob(e.target.value)} placeholder="Job or Task" />
-                        <Button ref={addJobBtn} className="bg-gray-800" onClick={() => {
+                        <Button ref={addJobBtn} className="bg-white text-black" onClick={() => {
                             dispatch({prop: enteredJob, propType: 'job',type: 'add',names: names,jobs: jobs});
                             setJobs(prev => {
                             
                             if(jobInputRef.current)jobInputRef.current.value = ''
                             return [...prev,enteredJob]
-                        });}}>Add</Button>
+                        });}}> <Plus/> </Button>
                     </div>
 
             
@@ -200,6 +212,45 @@ export default function Scheduler(){
                     </ScrollArea>
                     
             
+                </ParamController>
+
+                <ParamController title="Range">
+                <div className="flex flex-col items-center gap-2">
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button className="bg-black text-white flex gap-3 w-[200px]">
+                                <CalendarIcon size={20} />
+                                {
+                                    (selectedRange?.to && selectedRange?.from) ? 
+                                    <>
+                                        {format(selectedRange.from,'LLL dd')} - {format(selectedRange.to,'LLL dd')}
+                                    
+                                    </> : <span>Schedule Range</span>
+                                }
+                            </Button>
+                        </PopoverTrigger>
+
+                        <PopoverContent className="w-auto bg-black border-none">
+                            <Calendar className="bg-black text-white" mode='range' numberOfMonths={2} selected={selectedRange} onSelect={d => setDate(d)} />
+                        </PopoverContent>
+                    </Popover>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button className="bg-black text-white w-[200px]">For Days</Button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent className="bg-black text-white">
+                            <DropdownMenuCheckboxItem checked={true}>Sunday</DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem>Monday</DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem>Tuesday</DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem>Wednesday</DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem>Thursday</DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem>Friday</DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem>Saturday</DropdownMenuCheckboxItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+                
                 </ParamController>
 
                 <ParamController title="Job Assignment Percentage">
@@ -229,12 +280,11 @@ export default function Scheduler(){
 
             <section className="flex justify-center gap-3 my-10 print:hidden">
                 <Button className="bg-white text-black hover:bg-slate-200 hover:text-black">Create Preset</Button>
-                <Button className="bg-white text-black hover:bg-slate-200 hover:text-black">Generate</Button>
+                <Button onClick={() => generate({})} className="bg-white text-black hover:bg-slate-200 hover:text-black">Generate</Button>
                 <Button onClick={() => window.print()} className="bg-white text-black hover:bg-slate-200 hover:text-black">Print</Button>
             </section>
 
-            <section className="flex justify-center flex-wrap">
-                <Document/>
+            <section className="flex justify-center flex-wrap mb-10">
                 <Document/>
             </section>
         </main>
