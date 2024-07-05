@@ -133,6 +133,24 @@ export default function Scheduler(){
         saturday: true
     })
 
+    
+    const chosenDays = useMemo(() => { // ! This doesnt work for some reason
+
+        let list = new Array()
+        
+        for(let d in selectedDays){
+            if(selectedDays[d as Day] === true){
+                list.push(d)
+            }
+        }
+        
+        return list
+    },[selectedDays])
+
+    useEffect(() => {
+        console.log(chosenDays)
+    },[chosenDays])
+
     function updateDay(dayInfo: {day: Day, newVal: boolean}){
         console.log(dayInfo)
         setDays(prev => {
@@ -308,7 +326,7 @@ export default function Scheduler(){
 
             <section className="flex justify-center gap-3 my-10 print:hidden">
                 <Button className="bg-white text-black hover:bg-slate-200 hover:text-black">Create Preset</Button>
-                <Button onClick={() => generate({})} className="bg-white text-black hover:bg-slate-200 hover:text-black">Generate</Button>
+                <Button onClick={() => generate({names: names, jobs: jobs, dateRange: selectedRange as DateRange,days: [],jobPercentages: percentages})} className="bg-white text-black hover:bg-slate-200 hover:text-black">Generate</Button>
                 <Button onClick={() => window.print()} className="bg-white text-black hover:bg-slate-200 hover:text-black">Print</Button>
             </section>
 
