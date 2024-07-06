@@ -12,10 +12,10 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import generate from "@/utils/actions";
+import generate, { GenerateResponse } from "@/utils/actions";
 import { addDays, format } from "date-fns";
-import { CalendarIcon, Plus } from "lucide-react";
-import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { CalendarIcon, LoaderCircle, Plus } from "lucide-react";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState, useTransition } from "react";
 import { DateRange } from "react-day-picker";
 
 type Jobs = Record<string,number>
@@ -116,7 +116,6 @@ export default function Scheduler(){
 
     const [selectedPerson,setSelectedPerson] = useState('')
 
-
     // DATES
     const [selectedRange,setDate] = useState<DateRange | undefined>({
         from: new Date(),
@@ -170,11 +169,6 @@ export default function Scheduler(){
 
 
     const [percentages,dispatch] = useReducer(reducer,{})
-
-    useEffect(() => {
-        
-        console.log(selectedDays)
-    ,[selectedDays]})
     
     function removeName(name: string){
 
@@ -208,7 +202,21 @@ export default function Scheduler(){
         dispatch({prop: props.job, propType: 'job',type: 'set-job',percentValue: props.percent,forName: props.forName})
     }
 
+    const [generatedSchedule,setSchedule] = useState<GenerateResponse | null>(null)
+    const [isGenerating,startTransition] = useTransition()
 
+    const gen = useCallback(async () => {
+        let data = {names: names, jobs: jobs, dateRange: selectedRange as DateRange,days: chosenDays,advancedEnabled: advancedEnabled,jobPercentages: percentages}
+        
+        startTransition(async () => {
+            const res = await fetch('/api/generate',{method: 'POST', body: JSON.stringify(data)})
+            setSchedule(await res.json())
+        })
+    },[names,jobs])
+
+    useEffect(() => {
+        console.log('SCHEDULE',generatedSchedule)
+    },[generatedSchedule])
 
     return (<>
     
@@ -326,8 +334,8 @@ export default function Scheduler(){
 
             <section className="flex justify-center gap-3 my-10 print:hidden">
                 <Button className="bg-white text-black hover:bg-slate-200 hover:text-black">Create Preset</Button>
-                <Button onClick={() => generate({names: names, jobs: jobs, dateRange: selectedRange as DateRange,days: [],jobPercentages: percentages})} className="bg-white text-black hover:bg-slate-200 hover:text-black">Generate</Button>
-                <Button onClick={() => window.print()} className="bg-white text-black hover:bg-slate-200 hover:text-black">Print</Button>
+                <Button disabled={isGenerating} onClick={() => gen()} className="bg-white text-black hover:bg-slate-200 w-[100px] hover:text-black">{isGenerating ? <LoaderCircle className="animate-spin"/> : 'Generate' } </Button>
+                <Button disabled={isGenerating} onClick={() => window.print()} className="bg-white text-black hover:bg-slate-200 hover:text-black">Print</Button>
             </section>
 
             <section className="flex justify-center flex-wrap mb-10">
