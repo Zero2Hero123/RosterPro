@@ -1,6 +1,6 @@
 'use client'
 
-import Document from "@/components/Document";
+import Document from "@/components/document-ui/Document";
 import JobParameter from "@/components/JobParameter";
 import ParamController from "@/components/ParamController";
 import Segment from "@/components/Segment";
@@ -202,7 +202,7 @@ export default function Scheduler(){
         dispatch({prop: props.job, propType: 'job',type: 'set-job',percentValue: props.percent,forName: props.forName})
     }
 
-    const [generatedSchedule,setSchedule] = useState<GenerateResponse | null>(null)
+    const [generatedSchedule,setSchedule] = useState<GenerateResponse[] | null>(null)
     const [isGenerating,startTransition] = useTransition()
 
     const gen = useCallback(async () => {
@@ -213,6 +213,28 @@ export default function Scheduler(){
             setSchedule(await res.json())
         })
     },[names,jobs])
+
+    const paginatedSchedule = useMemo(() => {
+        let paginated: GenerateResponse[][] = []
+
+        if(generatedSchedule){
+            let onePage = []
+            let i = 0;
+            while(i < generatedSchedule.length){
+                onePage.push(generatedSchedule[i])
+                if((i % 8 == 0 && i != 0) || i == generatedSchedule.length-1){
+                    paginated.push(onePage)
+                    onePage = []
+                }
+                i++;
+            }
+        }
+
+        console.log('PAGES', paginated)
+
+        return paginated
+
+    },[generatedSchedule])
 
     useEffect(() => {
         console.log('SCHEDULE',generatedSchedule)
@@ -339,7 +361,9 @@ export default function Scheduler(){
             </section>
 
             <section className="flex justify-center flex-wrap mb-10">
-                <Document/>
+                {
+                    paginatedSchedule.map((v) => <Document names={names} days={v}/>)
+                }
             </section>
         </main>
     
