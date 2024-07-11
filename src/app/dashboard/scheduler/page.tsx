@@ -12,6 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
 import generate, { GenerateResponse } from "@/utils/actions";
 import { addDays, format } from "date-fns";
 import { CalendarIcon, LoaderCircle, Plus } from "lucide-react";
@@ -115,6 +117,8 @@ export default function Scheduler(){
     const [enteredJob,setEnteredJob] = useState<string>('')
 
     const [selectedPerson,setSelectedPerson] = useState('')
+
+    const { toast } = useToast()
 
     // DATES
     const [selectedRange,setDate] = useState<DateRange | undefined>({
@@ -240,6 +244,25 @@ export default function Scheduler(){
         console.log('SCHEDULE',generatedSchedule)
     },[generatedSchedule])
 
+    // Quick validation
+    function quickCheck(){
+        if(names.length > jobs.length){
+            toast({
+                title: "Warning",
+                description:"There are more people than jobs. Not everyone will have be assigned a job.",
+                action: <ToastAction onClick={() => gen()} altText={"Ok"}>Ok</ToastAction>
+            })
+        } else if(jobs.length > names.length){
+            toast({
+                title: "Warning",
+                description:"There are more jobs than people. Not every job will assigned to a person.",
+                action: <ToastAction onClick={() => gen()} altText={"Ok"}>Ok</ToastAction>
+            })
+        } else {
+            gen()
+        }
+    }
+
     return (<>
     
         <main>
@@ -247,15 +270,19 @@ export default function Scheduler(){
             
             <header className="flex justify-center gap-2 flex-wrap print:hidden">
                 <ParamController title="People">
-                    <div className="flex gap-2 px-2">
+                    <div className="flex gap-2 px-2 py-3">
                         <Input onKeyDown={e => e.key == 'Enter' && addNameBtnRef.current?.click()} ref={nameInputRef} className="bg-black" onChange={e => setEnteredName(e.target.value)} placeholder="Name" />
-                        <Button ref={addNameBtnRef} className="bg-white text-black" onClick={() => {
+                        <Button disabled={isGenerating} ref={addNameBtnRef} className="bg-white text-black hover:bg-slate-300" onClick={() => {
+                            if(enteredName.length == 0 || isGenerating) return;
+                            if(names.indexOf(enteredName) != -1) {toast({ title: 'Error', description: `Person with name, ${enteredName}, already exists.`, variant: "destructive" }); setEnteredName(''); return;}
+                            
+                            
                             dispatch({prop: enteredName, propType: 'name',type: 'add',names: names,jobs: jobs})
 
                             setNames(prev => {
                             if(nameInputRef.current) nameInputRef.current.value = ''
                             return [...prev,enteredName]
-                        });}}> <Plus/> </Button>
+                        }); setEnteredName('')}}> <Plus/> </Button>
                     </div>
                 
                     
@@ -268,15 +295,19 @@ export default function Scheduler(){
                 </ParamController>
 
                 <ParamController title="Jobs">
-                    <div className="flex gap-2 px-2">
+                    <div className="flex gap-2 px-2 py-3">
                         <Input onKeyDown={e => e.key == 'Enter' && addJobBtn.current?.click()} ref={jobInputRef} className="bg-black" onChange={e => setEnteredJob(e.target.value)} placeholder="Job or Task" />
-                        <Button ref={addJobBtn} className="bg-white text-black" onClick={() => {
+                        <Button disabled={isGenerating} ref={addJobBtn} className="bg-white text-black hover:bg-slate-300" onClick={() => {
+                            if(enteredJob.length == 0 || isGenerating) return;
+                            if(jobs.indexOf(enteredJob) != -1) {toast({ title: 'Error', description: `Job with name, ${enteredName}, already exists.`, variant: "destructive" }); setEnteredJob(''); return;}
+                            
+                            
                             dispatch({prop: enteredJob, propType: 'job',type: 'add',names: names,jobs: jobs});
                             setJobs(prev => {
                             
                             if(jobInputRef.current)jobInputRef.current.value = ''
                             return [...prev,enteredJob]
-                        });}}> <Plus/> </Button>
+                        }); setEnteredJob('');}}> <Plus/> </Button>
                     </div>
 
             
@@ -356,11 +387,11 @@ export default function Scheduler(){
 
             <section className="flex justify-center gap-3 my-10 print:hidden">
                 <Button className="bg-white text-black hover:bg-slate-200 hover:text-black">Create Preset</Button>
-                <Button disabled={isGenerating} onClick={() => gen()} className="bg-white text-black hover:bg-slate-200 w-[100px] hover:text-black">{isGenerating ? <LoaderCircle className="animate-spin"/> : 'Generate' } </Button>
+                <Button disabled={isGenerating} onClick={() => quickCheck()} className="bg-white text-black hover:bg-slate-200 w-[100px] hover:text-black">{isGenerating ? <LoaderCircle className="animate-spin"/> : 'Generate' } </Button>
                 <Button disabled={isGenerating} onClick={() => window.print()} className="bg-white text-black hover:bg-slate-200 hover:text-black">Print</Button>
             </section>
 
-            <section className="flex justify-center flex-wrap mb-10">
+            <section className="flex justify-center flex-wrap mb-10 gap-3">
                 {
                     paginatedSchedule.map((v) => <Document names={names} days={v}/>)
                 }

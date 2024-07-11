@@ -9,7 +9,7 @@ interface Props {
 
 const Document: React.FC<Props> = ({days,names}) => {
 
-    return (<div className="bg-white p-4 text-black w-[65%] max-w-[800px] print:w-[850px] print:h-[952px] aspect-[17/22] border border-black">
+    return (<div className="bg-white p-4 text-black w-[65%] max-w-[800px] print:w-[850px] print:h-[952px] aspect-[17/22] ">
         
         <div className="grid grid-rows-5 grid-cols-2">
             {

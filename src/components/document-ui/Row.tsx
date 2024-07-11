@@ -15,7 +15,7 @@ const Row: React.FC<Props> = ({day,names}) => {
             <hr/>
             <ul>
                 {
-                    names.map(n => <li className="flex justify-between"> <TextLabel name={n}/> <span>{day.assignments[n]}</span></li>)
+                    names.map(n => <li className="flex justify-between"> <TextLabel name={n}/> <span>{day.assignments[n] && day.assignments[n].trim().length > 0 ? day.assignments[n] : '-'}</span></li>)
                 }
             </ul>
         </div>
