@@ -7,6 +7,7 @@ import {ZodError, z} from 'zod'
 import { createClient } from './supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { error } from 'console'
 
 interface GeneratePropsWithEnabled {
     names: string[],
@@ -49,14 +50,14 @@ function createPrompt(args: GenerateProps){
         return `Generate a schedule. Randomly map the following names, ${args.names.join(', ')} to the following jobs, ${args.jobs.join(', ')} for each day. The schedule should be for days, ${args.days.join(', ')} between ${format(args.dateRange.from as Date,'LLL dd yyyy')} to ${format(args.dateRange.to as Date,'LLL dd yyyy')}. You are also given the following json object that maps each person's name to to an object mapping each job to the chance they have to getting assigned to that job in the whole schedule, ${JSON.stringify(args.jobPercentages)}, generate accordingly. Remember, Jobs can only be assigned once! They cannot be repeated for multiple persons! If no jobs left to assign to a person in a single day,assign one of the remaining jobs to the person, else, set that person's assigned job to a "-". Finally, return the schedule as a list of objects that have the following schema,${JSON.stringify(schema)} in plain raw json. If no jobs left to assign, set that person's assigned job to a "-". NO EXTRANEOUS TEXT. Let each object will represent a day.`
     }
 
-    return `Generate a schedule. Randomly map the following names, ${args.names.join(', ')} to the following jobs, ${args.jobs.join(', ')} for each day. The schedule should be for days, ${args.days.join(', ')} between ${format(args.dateRange.from as Date,'LLL dd yyyy')} to ${format(args.dateRange.to as Date,'LLL dd yyyy')}. Remember, Jobs can only be assigned once! They cannot be repeated for multiple persons! The order in which you assign jobs should also be random. If no jobs left to assign, set that person's assigned job to a "-". Finally, return the schedule as a list of objects that have the following schema,${JSON.stringify(schema)} in plain raw json. No Extraneous text. Let each object will represent a day.`
+    return `Generate a schedule. Randomly map the following names, ${args.names.join(', ')} to the following jobs, ${args.jobs.join(', ')} for each day. The schedule should be for days, ${args.days.join(', ')} between ${format(args.dateRange.from as Date,'LLL dd yyyy')} to ${format(args.dateRange.to as Date,'LLL dd yyyy')}. Remember, Jobs can only be assigned once! They cannot be repeated for multiple persons! The order in which you assign jobs should also be random. Finally, return the schedule as a list of objects that have the following schema,${JSON.stringify(schema)} in plain raw json. No Extraneous text. Let each object will represent a day.`
 }
 
 const openai = new OpenAI({
     apiKey: process.env.API_KEY!
 })
 
-export async function generate(args: GenerateProps): Promise<GenerateResponse> {
+export default async function generate(args: GenerateProps): Promise<GenerateResponse> {
 
     const prompt = createPrompt(args)
     console.log('PROMPT: ',prompt)
@@ -143,9 +144,9 @@ export async function logIn(prevState: any, data: FormData){
         return {
             message: res.error.message
         }
-    } else {
-        redirect('/')
     }
+
+    if(res.data) redirect('/')
 
     console.log('LOG IN',res)
 
@@ -157,4 +158,36 @@ export async function signOut(){
 
     await client.auth.signOut()
     redirect('/')
+}
+
+interface Preset {
+    names: string[]
+    jobs: string[],
+    date_range: DateRange,
+    job_percentages: Record<string,Record<string,number>>,
+    title: string
+}
+export async function savePreset(preset: Preset){
+    const client = createClient()
+
+    const res = await client.from('presets').insert({
+        names: preset.names,
+        jobs: preset.jobs,
+        date_range: preset.date_range,
+        job_percentages: preset.job_percentages,
+        title: preset.title
+    })
+
+    if(res.error){
+        console.error(res.error)
+    }
+
+}
+
+export async function deletePreset(id: string){
+    const client = createClient()
+
+    await client.from('presets').delete().eq('id',id)
+
+    revalidatePath('/dashboard/scheduler')
 }

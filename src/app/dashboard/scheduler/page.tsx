@@ -3,6 +3,7 @@
 import Document from "@/components/document-ui/Document";
 import JobParameter from "@/components/JobParameter";
 import ParamController from "@/components/ParamController";
+import PresetCard from "@/components/PresetCard";
 import Segment from "@/components/Segment";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -12,9 +13,12 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
-import generate, { GenerateResponse } from "@/utils/actions";
+import generate, { GenerateResponse, savePreset } from "@/utils/actions";
+import { createClient } from "@/utils/supabase/client";
+import { SupabaseClient } from "@supabase/supabase-js";
 import { addDays, format } from "date-fns";
 import { CalendarIcon, LoaderCircle, Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState, useTransition } from "react";
@@ -38,14 +42,19 @@ export type SetAction = Omit<Action,'names' | 'jobs' | 'type'> & {
     type: 'set-job'
 }
 
-type JobPercentagesReducer = (percentages: PercentagesMap,action: Action | SetAction) => PercentagesMap
+type OverWrite = {
+    type: 'overwrite',
+    percentages: PercentagesMap
+}
+
+type JobPercentagesReducer = (percentages: PercentagesMap,action: Action | SetAction | OverWrite) => PercentagesMap
 
 const reducer: JobPercentagesReducer = (percentages,action) => {
 
     // console.info('ACTION ',action)
 
     const jobMap: Jobs = {}
-    if(action.type != 'set-job'){
+    if(action.type != 'set-job' && action.type != 'overwrite'){
         for(let job of action.jobs){
             jobMap[job] = 100
         }
@@ -59,7 +68,7 @@ const reducer: JobPercentagesReducer = (percentages,action) => {
         return newMap;
     }
 
-    if(action.propType == 'name' && action.prop.length > 0){
+    if(action.type != 'overwrite' && action.propType == 'name' && action.prop.length > 0){
         if(action.type == 'add'){
             
             return {
@@ -74,7 +83,7 @@ const reducer: JobPercentagesReducer = (percentages,action) => {
             return newMap;
         }
 
-    } else if(action.propType == 'job' && action.prop.length > 0){
+    } else if(action.type != 'overwrite' && action.propType == 'job' && action.prop.length > 0){
         
         if(action.type == 'add'){
             console.log('add HERE')
@@ -93,6 +102,8 @@ const reducer: JobPercentagesReducer = (percentages,action) => {
             }
             return newMap;
         }
+    } else if(action.type == 'overwrite'){
+        return action.percentages
     }
 
     return percentages;
@@ -119,6 +130,8 @@ export default function Scheduler(){
     const [selectedPerson,setSelectedPerson] = useState('')
 
     const { toast } = useToast()
+
+    const [client,setClient] = useState<SupabaseClient>(createClient())
 
     // DATES
     const [selectedRange,setDate] = useState<DateRange | undefined>({
@@ -258,10 +271,65 @@ export default function Scheduler(){
                 description:"There are more jobs than people. Not every job will assigned to a person.",
                 action: <ToastAction onClick={() => gen()} altText={"Ok"}>Ok</ToastAction>
             })
+        } else if(names.length == 0 || jobs.length == 0){
+            toast({
+                title: "Error",
+                variant: 'destructive',
+                description:"Both the Names and Jobs paramters should have atleast one entry."
+            })
         } else {
             gen()
         }
     }
+    //...
+
+    // Handling Presets
+    const channelA = client
+    .channel('schema-db-changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public'
+      },
+      () => updatePresets()
+    )
+    .subscribe()
+
+    const [myPresets,setPresets] = useState<any[]>([])
+    const [enteredTitle,setPresetTitle] = useState('')
+
+    const updatePresets = useCallback(() => {
+        client.from('presets').select()
+            .then((res) => {
+                if(res.data) setPresets(res.data)
+                console.log('PRESETS',res.data)
+                setPresetTitle('')
+            })
+    },[])
+
+    const loadPreset = useCallback((id: string) => {
+        client.from('presets').select().eq('id',id)
+            .then(res => {
+                if(res.data){
+                    const preset = res.data[0]
+
+                    setNames(preset.names)
+                    setJobs(preset.jobs)
+                    setDate(preset.date_range)
+                    dispatch({type: 'overwrite', percentages: preset.job_percentages})
+
+                    toast({
+                        title: `Successfully Loaded Preset ${preset.title}!`
+                    })
+                }
+
+            })
+    },[])
+
+    useEffect(() => {
+        updatePresets()
+    },[])
 
     return (<>
     
@@ -286,7 +354,7 @@ export default function Scheduler(){
                     </div>
                 
                     
-                    <ScrollArea className="h-[80%] max-h-[79%]">
+                    <ScrollArea className="h-[80%] max-h-[71%]">
                         <div className="flex flex-col pt-6 px-4 gap-2">
                             {names.map(name => <Segment key={name} onClick={() => removeName(name)} title={name}/>)}
                         </div>
@@ -312,7 +380,7 @@ export default function Scheduler(){
 
             
                 
-                    <ScrollArea className="h-[80%] max-h-[79%]">
+                    <ScrollArea className="h-[80%] max-h-[71%]">
                         <div className="flex flex-col pt-6 px-4 gap-2 ">
                             {jobs.map(job => <Segment key={job} onClick={() => removeJob(job)} title={job}/>)}
                         </div>
@@ -360,7 +428,7 @@ export default function Scheduler(){
                 
                 </ParamController>
 
-                <ParamController title="Job Assignment Percentage">
+                <ParamController title="Job Assignment Percentage (Beta)">
                     
                     <div className="flex flex-col items-center justify-between h-[100%]">
                         <div>
@@ -386,7 +454,37 @@ export default function Scheduler(){
             </header>
 
             <section className="flex justify-center gap-3 my-10 print:hidden">
-                <Button className="bg-white text-black hover:bg-slate-200 hover:text-black">Create Preset</Button>
+                
+                <Sheet>
+                    <SheetTrigger asChild>
+                        <Button className="bg-white text-black hover:bg-slate-200 hover:text-black">My Presets</Button>
+                    </SheetTrigger>
+                    <SheetContent className="bg-black text-white">
+                        <SheetHeader>
+                            <SheetTitle className="text-white">My Presets</SheetTitle>
+
+                            <SheetDescription>Save & Load presets of the parameters you configure.</SheetDescription>
+                        </SheetHeader>
+                        
+                        <div>
+                            <div className="flex flex-col">
+                                <span className="font-medium text-2xl text-center">Create New Preset</span>
+                                <div className="flex gap-2">
+                                    <Input value={enteredTitle} onChange={e => setPresetTitle(e.target.value)} className="bg-black" placeholder="Preset Title" />
+                                    <Button onClick={() => savePreset({title: enteredTitle,names: names, jobs: jobs, date_range: selectedRange!,job_percentages: percentages})} className="bg-white text-black hover:bg-slate-300">Save</Button>
+                                </div>
+                            </div>
+                            <div className="p-4">
+
+                                {myPresets.map(p => <PresetCard loadPreset={loadPreset} key={p.id} id={p.id} title={p.title} names={p.names} jobs={p.jobs} date_range={p.date_range} />)}
+
+                                {/* list of Presets */}
+                            </div>
+                        </div>
+                    </SheetContent>
+                </Sheet>            
+
+
                 <Button disabled={isGenerating} onClick={() => quickCheck()} className="bg-white text-black hover:bg-slate-200 w-[100px] hover:text-black">{isGenerating ? <LoaderCircle className="animate-spin"/> : 'Generate' } </Button>
                 <Button disabled={isGenerating} onClick={() => window.print()} className="bg-white text-black hover:bg-slate-200 hover:text-black">Print</Button>
             </section>
