@@ -116,6 +116,8 @@ export async function signUp(prevState: any, data: FormData){
             email: newUser.email
         })
 
+        if(res.data) redirect('/')
+
         console.log('SIGN UP',res)
         
     } catch(e){
