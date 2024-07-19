@@ -169,15 +169,15 @@ export default function Scheduler(){
 
     function updateDay(dayInfo: {day: Day, newVal: boolean}){
         console.log(dayInfo)
+        
         setDays(prev => {
-            let dayMap = new Object(prev) as DaysMap
 
-            dayMap[dayInfo.day] = dayInfo.newVal
-
-            return dayMap
+            return {
+                ...prev,
+                [dayInfo.day]: dayInfo.newVal
+            }
         })
 
-        forceUpdate()
     }
 
     const [advancedEnabled,setAdvancedEnabled] = useState<boolean>(false)
@@ -223,13 +223,13 @@ export default function Scheduler(){
     const [isGenerating,startTransition] = useTransition()
 
     const gen = useCallback(async () => {
-        let data = {names: names, jobs: jobs, dateRange: selectedRange as DateRange,days: chosenDays,advancedEnabled: advancedEnabled,jobPercentages: percentages}
+        let data = {names: names, jobs: jobs, dateRange: selectedRange as DateRange,days: chosenDays.map(d => d+'s'),advancedEnabled: advancedEnabled,jobPercentages: percentages}
         
         startTransition(async () => {
             const res = await fetch('/api/generate',{method: 'POST', body: JSON.stringify(data)})
             setSchedule(await res.json())
         })
-    },[names,jobs])
+    },[names,jobs,selectedDays,selectedRange])
 
     const paginatedSchedule = useMemo(() => {
         let paginated: GenerateResponse[][] = []
@@ -326,6 +326,10 @@ export default function Scheduler(){
 
             })
     },[])
+
+    useEffect(() =>{
+        console.log('DAYS',selectedDays)
+    },[selectedDays])
 
     useEffect(() => {
         updatePresets()
@@ -491,7 +495,7 @@ export default function Scheduler(){
 
             <section className="flex justify-center flex-wrap mb-10 gap-3">
                 {
-                    paginatedSchedule.map((v) => <Document names={names} days={v}/>)
+                    paginatedSchedule.map((v,i) => <Document key={'DAY'+i} names={names} days={v}/>)
                 }
             </section>
         </main>
