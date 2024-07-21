@@ -16,7 +16,7 @@ export default function Home() {
         </Link>
       </section>
 
-      <video className="w-[90%] shadow-2xl shadow-slate-500 hover:cursor-pointer" loop autoPlay muted>
+      <video className="w-[90%] shadow-2xl shadow-slate-500 hover:cursor-pointer" loop autoPlay muted preload="none">
         <source src='/showcase.mp4' type="video/mp4" />
       </video>
       

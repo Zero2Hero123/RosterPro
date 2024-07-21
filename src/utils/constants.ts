@@ -1,3 +1,3 @@
 
 
-export const publicPaths = ['/']
+export const publicPaths = ['/','/showcase.mp4']
