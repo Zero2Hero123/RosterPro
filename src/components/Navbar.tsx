@@ -21,8 +21,12 @@ const Navbar: React.FC = async () => {
 
     const id = user.data.user?.id
     
+    let myProfile: any;
+
     const profiles = await client.from('profiles').select()
-    const myProfile = profiles.data![0]
+    if(profiles.data){
+        myProfile = profiles.data![0]
+    }
 
 
     return (
