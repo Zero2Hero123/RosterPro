@@ -22,7 +22,7 @@ const Auth: React.FC<{}> = () => {
         
         <main className=" flex justify-center items-center h-[88vh]">
             <div className="bg-black w-[35%] min-w-[360px] rounded-lg aspect-square">
-                <div className="flex justify-center text-xl items-center">
+                <div className="flex justify-center text-2xl items-center my-4">
                     <span>Join RosterPro</span>
                 </div>
                 <div className="">
