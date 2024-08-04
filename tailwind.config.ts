@@ -10,6 +10,9 @@ const config = {
   ],
   prefix: "",
   theme: {
+    fontFamily: {
+      'cursive': ['Snell Roundhand']
+    },
     container: {
       center: true,
       padding: "2rem",
