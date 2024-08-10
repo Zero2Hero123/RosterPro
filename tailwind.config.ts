@@ -11,7 +11,7 @@ const config = {
   prefix: "",
   theme: {
     fontFamily: {
-      'cursive': ['Snell Roundhand']
+      'qwe': ['Snell Roundhand']
     },
     container: {
       center: true,

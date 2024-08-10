@@ -1,6 +1,6 @@
 'use server'
 import Link from "next/link";
-import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from "./ui/navigation-menu";
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "./ui/navigation-menu";
 import Image from "next/image";
 
 import logo from '@/../public/icon.png'
@@ -8,6 +8,17 @@ import { createClient } from "@/utils/supabase/server";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { signOut } from "@/utils/actions";
 import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader } from "./ui/card";
+import ServiceDisplayCard from "./ServiceDisplayCard";
+
+const toolsAndServices = [
+    {
+        title: 'Person-Job Assigner',
+        desc: "Dyanmically create schedules in which people's names map to assigned jobs.",
+        href: '/dashboard/scheduler'
+    }
+]
+
 
 function getInitials(firstName: string,lastName: string){
 
@@ -31,8 +42,22 @@ const Navbar: React.FC = async () => {
 
     return (
         <nav className="bg-black h-16 flex items-center mb-4 print:hidden justify-between">
-            <Link href='/'><Image className="" src={logo} alt='logo' width={60} height={60} /></Link>
-            <div></div>
+
+            <div className="flex">
+                <Link href='/'><Image className="" src={logo} alt='logo' width={60} height={60} /></Link>
+                <NavigationMenu>
+                    <NavigationMenuItem className="dark bg-black text-black w-fit">
+                        <NavigationMenuTrigger>Tools & Services</NavigationMenuTrigger>
+
+                        <NavigationMenuContent className="bg-black text-white">
+                            <div className="grid grid-cols-2 grid-rows-2 gap-3 w-[500px] h-[300px] p-6">
+                                {toolsAndServices.map(t => <ServiceDisplayCard key={t.title} title={t.title} desc={t.desc} href={t.href} />)}
+                            </div>
+                        </NavigationMenuContent>
+                    </NavigationMenuItem>
+                </NavigationMenu>
+            </div>
+
             {myProfile && <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <div className="rounded-full bg-slate-800 p-3 hover:cursor-pointer mx-2">
