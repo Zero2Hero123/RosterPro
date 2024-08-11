@@ -39,6 +39,13 @@ const Navbar: React.FC = async () => {
         myProfile = profiles.data![0]
     }
 
+    const organizations = await client.from('organizations').select()
+    
+    let organization: any
+
+    if(organizations.data){
+        organization = organizations.data[0]
+    }
 
     return (
         <nav className="bg-black h-16 flex items-center mb-4 print:hidden justify-between">
