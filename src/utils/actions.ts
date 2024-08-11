@@ -5,9 +5,8 @@ import OpenAI from 'openai'
 import { DateRange } from 'react-day-picker'
 import {ZodError, z} from 'zod'
 import { createClient } from './supabase/server'
-import { redirect } from 'next/navigation'
+import { redirect, RedirectType } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { error } from 'console'
 
 interface GeneratePropsWithEnabled {
     names: string[],
@@ -116,9 +115,15 @@ export async function signUp(prevState: any, data: FormData){
             email: newUser.email
         })
 
-        if(res.data) redirect('/')
+        await client.from('organizations').insert({
+            name: data.get('organization_name') as string,
+            owner_id: res.data.user?.id
+        })
 
-        console.log('SIGN UP',res)
+        if(res.data) {
+            return {message: 'Success!'}
+        }
+            
         
     } catch(e){
         return {
