@@ -67,9 +67,7 @@ const Navbar: React.FC = async () => {
                 <DropdownMenuContent className="bg-black text-white">
                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
                     <DropdownMenuSeparator/>
-                    <DropdownMenuItem className="flex justify-center">
-                        <Link className="text-center" href={"/dashboard"}>Dashboard</Link>
-                    </DropdownMenuItem>
+                    
                     <DropdownMenuItem className="hover:cursor-pointer">
                         <form className="w-full" action={signOut}>
                             <Button className="bg-black hover:bg-transparent hover:text-black w-full">Logout</Button>
