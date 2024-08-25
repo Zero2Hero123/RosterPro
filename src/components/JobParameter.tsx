@@ -1,6 +1,6 @@
 'use client'
 
-import { Action, PercentagesMap, SetAction } from "@/app/dashboard/scheduler/page";
+import { Action, PercentagesMap, SetAction } from "@/app/scheduler/page";
 import { Slider } from "./ui/slider";
 import { Dispatch, useMemo, useState } from "react";
 

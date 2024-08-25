@@ -15,7 +15,7 @@ const toolsAndServices = [
     {
         title: 'Person-Job Assigner',
         desc: "Dyanmically create schedules in which people's names map to assigned jobs.",
-        href: '/dashboard/scheduler'
+        href: '/scheduler/person-job'
     }
 ]
 
