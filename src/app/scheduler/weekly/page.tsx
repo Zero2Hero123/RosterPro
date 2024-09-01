@@ -12,7 +12,9 @@ export default function WeeklyScheduler(){
     const container = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        const swapy = createSwapy(container.current)
+        const swapy = createSwapy(container.current,{
+            animation: 'dynamic'
+        })
 
         swapy.enable(true)
     })
@@ -20,8 +22,6 @@ export default function WeeklyScheduler(){
     // while(startDate.getDay() != 0){
     //     startDate = sub(startDate,{ days: 1 })
     // }
-
-    //! SWAPY NOT WORKING i hate my life
 
 
     return <>
@@ -41,11 +41,11 @@ export default function WeeklyScheduler(){
                 <span className="font-medium text-center"> Friday <br/> {formatDate(new Date(),"M/dd")}</span>
                 <span className="font-medium text-center"> Saturday <br/> {formatDate(new Date(),"M/dd")}</span>
                 
-                <div date-swapy-slot="a" className="border">
+                <div data-swapy-slot="a" className="border">
                 
                 </div>
-                <div date-swapy-slot="b" className="border">
-                    <div data-swapy-item="123">test2</div>
+                <div data-swapy-slot="b" className="border">
+                    <div className="flex justify-center items-center" data-swapy-item="123">test2</div>
                 </div>
                 <div className="border"></div>
                 <div className="border"></div>
