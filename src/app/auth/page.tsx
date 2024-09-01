@@ -47,7 +47,7 @@ const Auth: React.FC<{}> = () => {
                                 <div className="px-4 flex flex-col gap-2 items-center">
                                     <div className="flex flex-col gap-2 basis-[80%]">
                                         <Input required name="email" type="email" className="bg-black" placeholder="Email"/>
-                                        <Input name="organization_name" type="text" className="bg-black" placeholder="Organization Name (Optional)"/>
+                                        <Input name="business_name" type="text" className="bg-black" placeholder="Business Name (Optional)"/>
                                         <div className="flex gap-2">
                                             <Input required name="fname" className="bg-black" placeholder="First Name"/>
                                             <Input required name='lname' className="bg-black" placeholder="Last Name"/>

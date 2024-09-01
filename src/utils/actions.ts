@@ -115,8 +115,8 @@ export async function signUp(prevState: any, data: FormData){
             email: newUser.email
         })
 
-        await client.from('organizations').insert({
-            name: data.get('organization_name') as string,
+        await client.from('business').insert({
+            name: (data.get('business_name') as string),
             owner_id: res.data.user?.id
         })
 

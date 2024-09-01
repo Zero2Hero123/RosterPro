@@ -13,10 +13,15 @@ import ServiceDisplayCard from "./ServiceDisplayCard";
 
 const toolsAndServices = [
     {
-        title: 'Person-Job Assigner',
+        title: 'AssignFlow',
         desc: "Dyanmically create schedules in which people's names map to assigned jobs.",
         href: '/scheduler/person-job'
-    }
+    },
+    // {
+    //     title: 'Shift Sheet',
+    //     desc: "Create Clean shift timesheets for your business with ease.",
+    //     href: '/scheduler/weekly'
+    // },
 ]
 
 

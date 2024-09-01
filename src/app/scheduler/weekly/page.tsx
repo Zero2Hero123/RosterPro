@@ -1,5 +1,7 @@
 'use client'
+import Cell from "@/components/shift-table-ui/Cell";
 import { add, formatDate, sub } from "date-fns"
+import { Span } from "next/dist/trace";
 import { useEffect, useRef } from "react";
 
 import { createSwapy } from 'swapy'
@@ -10,6 +12,9 @@ export default function WeeklyScheduler(){
     let startDate = new Date()
 
     const container = useRef<HTMLDivElement>(null)
+
+    let arr = new Array(312)
+    arr.fill(1)
 
     useEffect(() => {
         const swapy = createSwapy(container.current,{
@@ -26,305 +31,30 @@ export default function WeeklyScheduler(){
 
     return <>
     
-    <main className="flex justify-center">
+    <main className="flex justify-center gap-10 flex-col md:flex-row">
 
-        <div className="bg-white p-4 text-black w-[65%] max-w-[800px] print:w-[850px] print:h-[952px] aspect-[17/22] flex justify-center">
+        <div className="print:hidden w-[400px] h-[500px] bg-black border border-white rounded-md ml-10">
 
-            <div id="test" ref={container} className="grid grid-rows-40 grid-cols-8">
+        </div>
+
+
+        {/* Document Component */}
+        <div className="bg-white p-4 text-black w-[65%] max-w-[800px] print:w-[850px] print:h-[952px] aspect-[17/22] flex justify-center mr-10">
+
+            <div ref={container} className="grid grid-rows-40 grid-cols-8">
 
                 {/* Days of the Week */}
-                <span className="font-medium text-center col-start-2"> Sunday <br/> {formatDate(new Date(),"M/dd")}</span>
-                <span className="font-medium text-center"> Monday <br/> {formatDate(new Date(),"M/dd")}</span>
-                <span className="font-medium text-center"> Tuesday <br/> {formatDate(new Date(),"M/dd")}</span>
-                <span className="font-medium text-center"> Wednesday <br/> {formatDate(new Date(),"M/dd")}</span>
-                <span className="font-medium text-center"> Thursday <br/> {formatDate(new Date(),"M/dd")}</span>
-                <span className="font-medium text-center"> Friday <br/> {formatDate(new Date(),"M/dd")}</span>
-                <span className="font-medium text-center"> Saturday <br/> {formatDate(new Date(),"M/dd")}</span>
+                <span className="text-sm font-medium text-center col-start-2"> Sunday <br/> {formatDate(new Date(),"M/dd")}</span>
+                <span className="text-sm font-medium text-center"> Monday <br/> {formatDate(new Date(),"M/dd")}</span>
+                <span className="text-sm font-medium text-center"> Tuesday <br/> {formatDate(new Date(),"M/dd")}</span>
+                <span className="text-sm font-medium text-center"> Wednesday <br/> {formatDate(new Date(),"M/dd")}</span>
+                <span className="text-sm font-medium text-center"> Thursday <br/> {formatDate(new Date(),"M/dd")}</span>
+                <span className="text-sm font-medium text-center"> Friday <br/> {formatDate(new Date(),"M/dd")}</span>
+                <span className="text-sm font-medium text-center"> Saturday <br/> {formatDate(new Date(),"M/dd")}</span>
                 
-                <div data-swapy-slot="a" className="border">
-                
-                </div>
-                <div data-swapy-slot="b" className="border">
-                    <div className="flex justify-center items-center" data-swapy-item="123">test2</div>
-                </div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
-                <div className="border"></div>
+                {
+                    arr.map((v,i) => <Cell key={'cell_'+i} index={i} />)
+                }
                 
             </div>
        
