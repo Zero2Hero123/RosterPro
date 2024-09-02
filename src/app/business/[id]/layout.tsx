@@ -25,7 +25,7 @@ export default function Layout({
     return (
         <>
             <main className="flex">
-                <section className="h-[91.7vh] bg-black lg:basis-[230px] p-3 flex flex-col gap-3">
+                <section className="h-[91.7vh] bg-black  lg:basis-[230px] p-3 flex flex-col gap-3">
 
                   <Separator/>
 
