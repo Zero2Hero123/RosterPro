@@ -15,13 +15,13 @@ const toolsAndServices = [
     {
         title: 'AssignFlow',
         desc: "Dyanmically create schedules in which people's names map to assigned jobs.",
-        href: '/scheduler/person-job'
+        href: '/scheduler/assign-flow'
     },
-    // {
-    //     title: 'Shift Sheet',
-    //     desc: "Create Clean shift timesheets for your business with ease.",
-    //     href: '/scheduler/weekly'
-    // },
+    {
+        title: 'Shift Sheet',
+        desc: "Create Clean shift timesheets for your business with ease.",
+        href: '/scheduler/shift-sheet'
+    },
 ]
 
 
@@ -53,7 +53,7 @@ const Navbar: React.FC = async () => {
     }
 
     return (
-        <nav className="bg-black h-16 flex items-center mb-4 print:hidden justify-between">
+        <nav className="bg-black h-16 flex items-center print:hidden justify-between">
 
             <div className="flex">
                 <Link href='/'><Image className="" src={logo} alt='logo' width={60} height={60} /></Link>
