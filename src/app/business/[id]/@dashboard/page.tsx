@@ -15,12 +15,15 @@ export default async function Dashboard({params}: Props){
 
     const supabase = createClient()
 
-    const res = await supabase.from('business').select().eq('id',params.id)
+    const user = await supabase.auth.getUser()
+    if(!user.data.user) notFound()
 
-    if(!res.data) notFound()
-    if(!res.data.length) notFound();
+    const {data,error} = await supabase.from('business').select().eq('id',params.id)
 
-    const currBiz = res.data[0];
+    if(!data) notFound()
+    if(!data.length) notFound();
+
+    const currBiz = data[0];
 
 
     const numMembers = await supabase.rpc('numberOfMembers',{
@@ -31,7 +34,7 @@ export default async function Dashboard({params}: Props){
     return <>
         <span className="text-3xl font-bold text-center w-[100%]">{currBiz.name}</span>
         <Link className="hover:cursor-pointer" href={`/business/${params.id}/employees`}> <span className="flex items-center gap-2"> <Users size={'20'}/> {numMembers.data} {numMembers.data != 1 ? 'Employees' : 'Employee'}</span> </Link>
-        <Invite/>
+        {currBiz.owner_id == user.data.user.id && <Invite businessName={currBiz.name} businessId={currBiz.id}/>}
     
     </>
 }

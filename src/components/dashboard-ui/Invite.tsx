@@ -1,19 +1,40 @@
+'use client'
 import { UserRoundPlus } from "lucide-react";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "../ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Input } from "../ui/input";
 
+import { Resend } from 'resend'
+import { createClient } from "@/utils/supabase/server";
+import { usePathname, useRouter } from "next/navigation";
+import { sendEmail } from "@/utils/actions";
+import { useRef } from "react";
+import { useToast } from "../ui/use-toast";
+
+interface Props {
+    businessName: string
+    businessId: string
+}
 
 
+export default function Invite({businessName,businessId}: Props){
 
+    const emailInput = useRef<HTMLInputElement>(null)
 
+    const { toast } = useToast()
+    
+    function notify(){
+        console.log('NOTIFY')
+        if(emailInput.current){
+            emailInput.current.value = ''
+        }
 
-
-
-
-export default async function Invite(){
-
+        toast({
+            title: "Success!",
+            description: 'Invite Sent!',
+        })
+    }
 
     return (<>
 
@@ -26,9 +47,13 @@ export default async function Invite(){
                 <DialogHeader>
                     <DialogTitle className="flex items-center justify-center"> <UserRoundPlus size={15} />  Send Invite</DialogTitle>
                 </DialogHeader>
-                <form action={'#'} method="POST" className="flex gap-3">
-                    <Input required autoFocus className="bg-black" placeholder="Email" type='email' />
-                    <Button type="submit" className="bg-white text-black hover:bg-slate-300">Send</Button>
+                <form action={sendEmail} method="POST" className="flex gap-3">
+                    <input className="hidden" name="bizName" value={businessName} />
+                    <input className="hidden" name="bizId" value={businessId} />
+
+
+                    <Input ref={emailInput} name="email" required className="bg-black" placeholder="Email" type='email' />
+                    <Button onClick={notify} type="submit" className="bg-white text-black hover:bg-slate-300">Send</Button>
                 </form>
             </DialogContent>
 

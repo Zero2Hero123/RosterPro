@@ -20,7 +20,7 @@ const Auth: React.FC<{}> = () => {
     const router = useRouter()
 
     if(state.message == 'Success!'){
-        router.push('/')
+        router.back()
     }
 
     return (<>
