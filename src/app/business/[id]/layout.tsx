@@ -1,9 +1,13 @@
 'use client'
 import DashboardTab from "@/components/dashboard-ui/DashboardTab";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import { House, MessageCircleMore, Users } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
+import { error } from "console";
+import { ChevronsUpDown, House, MessageCircleMore, Users } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 
 
@@ -21,11 +25,47 @@ export default function Layout({
     params: {id: string}
   }>) {
 
+    const supabase = createClient()
+    // TODO finish business dropdown
+
+
+    const [user,setUser] = useState({}) 
+    const [listOfBusinesses,setListBusinesses] = useState<any[]>([])
+    const [selectedBusiness, setSelected] = useState<any | null>(null)
+
+    useEffect(() => {
+      supabase.from('business').select().eq('id',params.id)
+      .then(({data, error}) => {
+        setSelected(data && data[0])
+
+        if(error) console.error(error)
+      })
+
+      supabase.from('user_businesses').select().eq('user_id','')
+    },[])
+
+
+
 
     return (
         <>
             <main className="flex">
                 <section className="h-[91.7vh] bg-black  lg:basis-[230px] p-3 flex flex-col gap-3">
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button className="flex justify-around items-center border border-gray-500 bg-black hover:bg-slate-950"> <span className="grow text-center">{selectedBusiness ? selectedBusiness.name : 'None'}</span> <ChevronsUpDown size={'18'}/> </Button>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent className="bg-black text-white w-56">
+
+                    {
+                      listOfBusinesses.map(b => <DropdownMenuItem> <span className="text-center grow hover:cursor-pointer">{b.name}</span> </DropdownMenuItem>)
+                    }
+
+
+                    </DropdownMenuContent>
+                  </DropdownMenu>
 
                   <Separator/>
 
