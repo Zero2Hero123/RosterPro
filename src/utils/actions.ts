@@ -8,6 +8,11 @@ import { createClient } from './supabase/server'
 import { redirect, RedirectType } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
+import { Resend } from 'resend'
+import EmailInvite from '@/components/dashboard-ui/EmailInvite'
+
+const resend = new Resend(process.env.RESEND_KEY)
+
 interface GeneratePropsWithEnabled {
     names: string[],
     jobs: string[],
@@ -197,4 +202,29 @@ export async function deletePreset(id: string){
     await client.from('presets').delete().eq('id',id)
 
     revalidatePath('/dashboard/scheduler')
+}
+
+export async function sendEmail(data: FormData){
+
+    const client = createClient()
+    const user = await client.auth.getUser()
+
+    const id = user.data.user?.id
+    
+    let myProfile: any;
+
+    const profiles = await client.from('profiles').select().eq('id',id)
+    if(profiles.data){
+        myProfile = profiles.data![0]
+    }
+
+    const email = data.get('email') as string
+
+    const res = await resend.emails.send({
+        from: 'RosterPro <onboarding@resend.dev>',
+        to: [email],
+        subject: 'Invite Recieved',
+        react: EmailInvite({name: myProfile.first_name+' '+myProfile.last_name,businessName: data.get('bizName') as string,id: data.get('bizId') as string})
+    })
+
 }
