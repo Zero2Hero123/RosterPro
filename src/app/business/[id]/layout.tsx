@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
+import { User } from "@supabase/supabase-js";
 import { error } from "console";
-import { ChevronsUpDown, House, MessageCircleMore, Users } from "lucide-react";
+import { ChevronsUpDown, House, LoaderCircle, MessageCircleMore, Users } from "lucide-react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -29,20 +31,38 @@ export default function Layout({
     // TODO finish business dropdown
 
 
-    const [user,setUser] = useState({}) 
-    const [listOfBusinesses,setListBusinesses] = useState<any[]>([])
+    const [user,setUser] = useState<User | null>(null) 
+    const [listOfBusinesses,setListBusinesses] = useState<any[] | null>([])
     const [selectedBusiness, setSelected] = useState<any | null>(null)
+
+    useEffect(() => {
+      supabase.auth.getUser().then(res => {
+        setUser(res.data.user)
+      })
+    },[])
 
     useEffect(() => {
       supabase.from('business').select().eq('id',params.id)
       .then(({data, error}) => {
+        if(error) console.warn(error)
+
         setSelected(data && data[0])
 
-        if(error) console.error(error)
       })
 
-      supabase.from('user_businesses').select().eq('user_id','')
-    },[])
+      console.log(user)
+      
+      if(!user) return
+      supabase.from('user_businesses').select().eq('user_id',user?.id)
+      .then(({data,error}) => {
+        if(error) console.warn(error)
+
+        setListBusinesses(data)
+      })
+      
+    },[user])
+
+
 
 
 
@@ -54,13 +74,13 @@ export default function Layout({
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button className="flex justify-around items-center border border-gray-500 bg-black hover:bg-slate-950"> <span className="grow text-center">{selectedBusiness ? selectedBusiness.name : 'None'}</span> <ChevronsUpDown size={'18'}/> </Button>
+                      <Button className="flex justify-around items-center border border-gray-500 bg-black hover:bg-slate-950"> <span className="grow text-center flex justify-center">{selectedBusiness ? selectedBusiness.name : <LoaderCircle className="animate-spin"/>}</span> <ChevronsUpDown size={'18'}/> </Button>
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent className="bg-black text-white w-56">
 
                     {
-                      listOfBusinesses.map(b => <DropdownMenuItem> <span className="text-center grow hover:cursor-pointer">{b.name}</span> </DropdownMenuItem>)
+                      listOfBusinesses && listOfBusinesses.map(b => <DropdownMenuItem key={'LIST_'+b.business_id} className="p-0"> <BusinessLink businessId={b.business_id} /> </DropdownMenuItem>)
                     }
 
 
@@ -82,3 +102,22 @@ export default function Layout({
         </>
     );
   }
+
+function BusinessLink({businessId}: {businessId: string}){
+
+  const [business,setBusiness] = useState<any| null>(null)
+
+  const supabase = createClient()
+
+  useEffect(() => {
+  
+    supabase.from('business').select().eq('id',businessId)
+    .then((res) => {
+      setBusiness(res.data && res.data[0])
+    })
+
+  },[])
+
+  
+  return <Link href={`/business/${businessId}`} className="text-center grow hover:cursor-pointer inline px-1 py-2">{business ? business.name : <LoaderCircle className="animate-spin text-center" />}</Link>
+}
