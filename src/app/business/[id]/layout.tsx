@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { error } from "console";
-import { ChevronsUpDown, House, LoaderCircle, MessageCircleMore, Users } from "lucide-react";
+import { Building, ChevronsUpDown, House, LoaderCircle, MessageCircleMore, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -70,11 +70,11 @@ export default function Layout({
     return (
         <>
             <main className="flex">
-                <section className="h-[91.7vh] bg-black  lg:basis-[230px] p-3 flex flex-col gap-3">
+                <section className="h-[calc(100vh-4rem)] bg-black  lg:basis-[230px] px-3 flex flex-col gap-3">
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button className="flex justify-around items-center border border-gray-500 bg-black hover:bg-slate-950"> <span className="grow text-center flex justify-center">{selectedBusiness ? selectedBusiness.name : <LoaderCircle className="animate-spin"/>}</span> <ChevronsUpDown size={'18'}/> </Button>
+                      <Button className="flex justify-around items-center border border-gray-500 bg-black hover:bg-slate-950"> <span className="grow text-center">{selectedBusiness ? selectedBusiness.name : 'None'}</span> <ChevronsUpDown size={'18'}/> </Button>
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent className="bg-black text-white w-56">
@@ -97,7 +97,7 @@ export default function Layout({
                 </section>
                 
                 
-                <section className="flex justify-start flex-col items-center grow p-5">{dashboard}</section>
+                <section className="flex justify-start flex-col items-center grow px-2 py-1">{dashboard}</section>
             </main>
         </>
     );
