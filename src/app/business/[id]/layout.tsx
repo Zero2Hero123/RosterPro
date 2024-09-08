@@ -5,7 +5,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { error } from "console";
 import { Building, ChevronsUpDown, House, LoaderCircle, MessageCircleMore, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
