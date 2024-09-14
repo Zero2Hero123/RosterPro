@@ -10,6 +10,8 @@ import { signOut } from "@/utils/actions";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import ServiceDisplayCard from "./ServiceDisplayCard";
+import BusinessLink from "./dashboard-ui/BusinessLink";
+import { Building2, ChevronsRight } from "lucide-react";
 
 const toolsAndServices = [
     {
@@ -44,13 +46,8 @@ const Navbar: React.FC = async () => {
         myProfile = profiles.data![0]
     }
 
-    const organizations = await client.from('organizations').select()
-    
-    let organization: any
+    const listOfBusinesses = await (await client.from('user_businesses').select().eq('user_id',user.data.user?.id)).data
 
-    if(organizations.data){
-        organization = organizations.data[0]
-    }
 
     return (
         <nav className="bg-black h-16 flex items-center print:hidden justify-between">
@@ -58,8 +55,8 @@ const Navbar: React.FC = async () => {
             <div className="flex">
                 <Link href='/'><Image className="" src={logo} alt='logo' width={60} height={60} /></Link>
                 <NavigationMenu>
-                    <NavigationMenuItem className="dark bg-black text-black w-fit">
-                        <NavigationMenuTrigger>Tools & Services</NavigationMenuTrigger>
+                    <NavigationMenuItem className="dark bg-black text-black w-fit flex items-center">
+                        <NavigationMenuTrigger >Tools & Services</NavigationMenuTrigger>
 
                         <NavigationMenuContent className="bg-black text-white">
                             <div className="grid grid-cols-2 grid-rows-2 gap-3 w-[500px] h-[300px] p-6">
@@ -70,23 +67,39 @@ const Navbar: React.FC = async () => {
                 </NavigationMenu>
             </div>
 
-            {myProfile && <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <div className="rounded-full bg-slate-800 p-3 hover:cursor-pointer mx-2">
-                        <span className="font-medium text-xl">{myProfile && getInitials(myProfile.first_name,myProfile.last_name)}</span>
-                    </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-black text-white">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                    <DropdownMenuSeparator/>
-                    
-                    <DropdownMenuItem className="hover:cursor-pointer">
-                        <form className="w-full" action={signOut}>
-                            <Button className="bg-black hover:bg-transparent hover:text-black w-full">Logout</Button>
-                        </form>
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>}
+            {myProfile && <div className="flex items-center">
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button className="flex justify-around items-center border border-gray-500 bg-black hover:bg-slate-950 gap-2"> <span className="grow text-center hidden md:inline"> Go to Business </span> <Building2 />  </Button>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent className="bg-black text-white w-56">
+
+                    {
+                        listOfBusinesses && listOfBusinesses.map(b => <DropdownMenuItem key={'LIST_'+b.business_id} className="p-0"> <BusinessLink businessId={b.business_id} /> </DropdownMenuItem>)
+                    }
+
+
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <div className="rounded-full bg-slate-800 p-3 hover:cursor-pointer mx-2">
+                            <span className="font-medium text-xl">{myProfile && getInitials(myProfile.first_name,myProfile.last_name)}</span>
+                        </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-black text-white">
+                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                        <DropdownMenuSeparator/>
+                        
+                        <DropdownMenuItem className="hover:cursor-pointer">
+                            <form className="w-full" action={signOut}>
+                                <Button className="bg-black hover:bg-transparent hover:text-black w-full">Logout</Button>
+                            </form>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                </div>}
             
         </nav>
     )
