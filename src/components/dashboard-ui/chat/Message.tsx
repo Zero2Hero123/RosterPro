@@ -4,17 +4,21 @@
 
 
 interface Props {
-    message?: any;
+    content: string;
+    businessId: string;
+    authorId: string;
+    createdAt: Date;
 }
 
 
 
-const Message = (props: Props) => {
+const Message = ({content,authorId}: Props) => {
 
     return <div className="flex justify-start">
 
         <div className="bg-slate-800 text-white p-3 rounded-lg text-sm">
-            This is a message
+            <span>{authorId}</span>
+            <span>{content}</span>
         </div>
 
     </div>

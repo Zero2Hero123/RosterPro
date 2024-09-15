@@ -5,7 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { Building, ChevronsUpDown, House, LoaderCircle, MessageCircleMore, Users } from "lucide-react";
+import { Building, ChevronsUpDown, House, LoaderCircle, MessageCircleMore, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -48,8 +48,6 @@ export default function Layout({
         setSelected(data && data[0])
 
       })
-
-      console.log(user)
       
       if(!user) return
       supabase.from('user_businesses').select().eq('user_id',user?.id)
@@ -92,6 +90,9 @@ export default function Layout({
                   <DashboardTab href={`/business/${params.id}/employees`} > <Users/> <span className="grow text-center hidden sm:inline">Employees</span> </DashboardTab>
                   <DashboardTab href={`/business/${params.id}/chat`}> <MessageCircleMore/> <span className="grow text-center hidden sm:inline">Public Chat</span> </DashboardTab>
                   
+                  <Separator/>
+
+                  <DashboardTab href={`/business/${params.id}/settings`}> <Settings /> <span className="grow text-center hidden sm:inline">Settings</span> </DashboardTab>
 
                 </section>
                 

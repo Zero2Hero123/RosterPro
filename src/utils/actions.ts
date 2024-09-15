@@ -232,10 +232,27 @@ export async function sendEmail(data: FormData){
 // TODO finish send-message action
 export async function sendMessage(msg: FormData){
 
+    const supabase = createClient()
+
     const message = {
         author_id: msg.get('author-id') as string,
         business_id: msg.get('business-id') as string,
         content: msg.get('message-content') as string,
+    }
+
+
+    const msgSchema = z.object({
+        author_id: z.string().uuid(),
+        business_id: z.string().uuid(),
+        content: z.string()
+    })
+
+    const parse = msgSchema.safeParse(message)
+
+    if(parse.success){
+        await supabase.from('messages').insert(parse.data)
+    } else {
+        console.error(parse.error.message)
     }
 
 }
