@@ -432,7 +432,7 @@ export default function Scheduler(){
                 
                 </ParamController>
 
-                <ParamController title="Job Assignment Percentage (Beta)">
+                {/* <ParamController title="Job Assignment Percentage (Beta)">
                     
                     <div className="flex flex-col items-center justify-between h-[100%]">
                         <div>
@@ -454,7 +454,7 @@ export default function Scheduler(){
                             <span className="">Enabled?</span> <Checkbox onCheckedChange={e => setAdvancedEnabled(e.valueOf() as boolean)} className=""/>
                         </div>
                     </div>
-                </ParamController>
+                </ParamController> */}
             </header>
 
             <section className="flex justify-center gap-3 my-10 print:hidden">
