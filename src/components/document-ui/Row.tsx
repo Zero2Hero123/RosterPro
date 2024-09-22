@@ -19,7 +19,7 @@ const Row: React.FC<Props> = ({day,names}) => {
         const swapy = createSwapy(container.current)
 
         swapy.enable(true)
-    })
+    },[])
 
 
     return <>
