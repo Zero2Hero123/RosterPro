@@ -5,7 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { Building, ChevronsUpDown, House, LoaderCircle, MessageCircleMore, Settings, Users } from "lucide-react";
+import { Building, CalendarCog, ChevronsUpDown, House, LoaderCircle, MessageCircleMore, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -89,9 +89,10 @@ export default function Layout({
                   <DashboardTab href={`/business/${params.id}`}>  <House/> <span className="grow text-center hidden sm:inline">Home</span> </DashboardTab>
                   <DashboardTab href={`/business/${params.id}/employees`} > <Users/> <span className="grow text-center hidden sm:inline">Employees</span> </DashboardTab>
                   <DashboardTab href={`/business/${params.id}/chat`}> <MessageCircleMore/> <span className="grow text-center hidden sm:inline">Public Chat</span> </DashboardTab>
-                  
-                  <Separator/>
+        
 
+                  <Separator/>
+                  <DashboardTab href={`/business/${params.id}/availability`}> <CalendarCog/> <span className="grow text-center hidden sm:inline">My Availability</span> </DashboardTab>
                   <DashboardTab href={`/business/${params.id}/settings`}> <Settings /> <span className="grow text-center hidden sm:inline">Settings</span> </DashboardTab>
 
                 </section>
