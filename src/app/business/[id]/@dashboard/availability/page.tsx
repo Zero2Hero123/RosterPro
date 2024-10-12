@@ -60,6 +60,8 @@ export default function Availability({ params }: Props){
 
     const { toast } = useToast()
 
+    const [showSave,setShowSave] = useState<boolean>(false)
+
     const [availability,setAvailability] = useReducer<AvailabilityReducer>(updateAvailabilty,{
         sunday: {from: '',to: '', enabled: false},
         monday: {from: '',to: '', enabled: false},
@@ -98,7 +100,7 @@ export default function Availability({ params }: Props){
         console.log(availability[(day as keyof Availability)])
         supabase.from('availability').update({
             [day]: {...availability[(day as keyof Availability)]},
-        }).eq('user_id',user?.id).then(res => {
+        }).eq('user_id',user?.id).eq('business_id',params.id).then(res => {
             if(res.error) {
                 console.error(res.error)
             } else {
@@ -107,6 +109,8 @@ export default function Availability({ params }: Props){
                     title: 'Successfully Saved Changes!'
                 })
             }
+
+            setShowSave(false)
             
         })
         
@@ -118,7 +122,7 @@ export default function Availability({ params }: Props){
     }
 
     useEffect(() =>{
-        console.log(availability)
+        setShowSave(true)
     },[availability])
 
 
@@ -161,7 +165,7 @@ export default function Availability({ params }: Props){
                                 {times.map(t => <SelectItem key={'select_'+t} value={`${t}`}>{parseTime(`${t}`)}</SelectItem>)}
                             </SelectContent>
                         </Select>
-                        <Button onClick={() => saveAvailability(d)} className="">Save</Button>
+                        <Button onClick={() => saveAvailability(d)} className={`transition-all ${showSave ? 'scale-100 ' : 'scale-0'}`}>Save</Button>
                     </div>
                     
                 </TabsContent>)}
