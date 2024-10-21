@@ -40,7 +40,7 @@ export default function Invite({businessName,businessId}: Props){
 
         <Dialog>
             <DialogTrigger asChild>
-                <Button className="flex justify-between bg-slate-950 h-9 my-4"><UserRoundPlus size={15} />  <span className="grow text-center">Invite</span> </Button>
+                <Button className="absolute rounded-full bottom-10 right-10 flex justify-center items-center bg-white text-black hover:bg-slate-200 h-14 w-14"><UserRoundPlus size={30} /> </Button>
             </DialogTrigger>
 
             <DialogContent className="bg-black">

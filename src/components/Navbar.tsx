@@ -84,9 +84,9 @@ const Navbar: React.FC = async () => {
                 </DropdownMenu>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <div className="rounded-full bg-slate-800 p-3 hover:cursor-pointer mx-2">
-                            <span className="font-medium text-xl">{myProfile && getInitials(myProfile.first_name,myProfile.last_name)}</span>
-                        </div>
+                    <div className={`rounded-full flex justify-center items-center h-12 w-12 bg-gradient-to-tr from-blue-600 to-blue-900 p-3 hover:cursor-pointer mx-2`}>
+                        <span className=" font-medium text-2xl">{getInitials(myProfile.first_name,myProfile.last_name)}</span>
+                    </div>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-black text-white">
                         <DropdownMenuLabel>My Account</DropdownMenuLabel>

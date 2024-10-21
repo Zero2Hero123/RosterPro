@@ -71,7 +71,7 @@ export default function Layout({
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button className="flex justify-around items-center border border-gray-500 bg-black hover:bg-slate-950"> <span className="grow text-center">{selectedBusiness ? selectedBusiness.name : 'None'}</span> <ChevronsUpDown size={'18'}/> </Button>
+                      <Button className="hidden md:flex justify-around items-center border border-gray-500 bg-black hover:bg-slate-950"> <span className="grow text-center">{selectedBusiness ? selectedBusiness.name : 'None'}</span> <ChevronsUpDown size={'18'}/> </Button>
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent className="bg-black text-white w-56">
