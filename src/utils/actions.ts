@@ -256,3 +256,38 @@ export async function sendMessage(msg: FormData){
     }
 
 }
+
+export async function requestTimeOff(prevState: any,formData: FormData){
+
+    const supabase = createClient()
+
+    const request = {
+        from: new Date(Number(formData.get('from'))),
+        to: new Date(Number(formData.get('to'))),
+        reason: formData.get('reason'),
+        business_id: formData.get('business_id')
+    }
+
+    const timeOffRequest = z.object({
+        from: z.date(),
+        to: z.date(),
+        reason: z.string(),
+        business_id: z.string()
+    })
+
+    const check = timeOffRequest.safeParse(request)
+
+    if(check.success){
+        const res = await supabase.from('time_off_request').insert(request)
+
+        return {
+            message: `${format(request.from,'MMMM dd, yyyy')} to ${format(request.to,'MMMM dd, yyyy')}`
+        }
+    } else {
+        console.error('INVALID TIME OFF REQUEST')
+    }
+
+    return {
+        message: ''
+    }
+}

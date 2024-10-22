@@ -1,7 +1,14 @@
 import ProfilePic from "@/components/ProfilePic";
+import DatePicker from "@/components/dashboard-ui/DatePicker";
 import Invite from "@/components/dashboard-ui/Invite";
+import TimeOffRequestForm from "@/components/dashboard-ui/TimeOffRequestForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
+import { requestTimeOff } from "@/utils/actions";
 import { createClient } from "@/utils/supabase/server"
 import { CalendarCog, Clock, UserRoundPlus, Users } from "lucide-react";
 import Link from "next/link";
@@ -54,16 +61,29 @@ export default async function Dashboard({params}: Props){
         </header>
         <main className="w-full flex justify-center items-center p-6">
             <div className="flex flex-col w-[50%] gap-4 items-center">
-                <Link href={'#'} className="w-full">
                 
-                    <Card className="min-w-[200px] w-full">
-                        <CardHeader>
-                            <CardTitle className="flex gap-1"> Request time off</CardTitle>
-                            <CardDescription>Make a request for time off.</CardDescription>
-                        </CardHeader>
-                    </Card>
                 
-                </Link>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Card className="min-w-[200px] w-full">
+                            <CardHeader>
+                                <CardTitle className="flex gap-1"> Request time off</CardTitle>
+                                <CardDescription>Make a request for time off.</CardDescription>
+                            </CardHeader>
+                        </Card>
+                    </DialogTrigger>
+
+
+                    <DialogContent className="bg-black border-slate-600">
+                        <DialogHeader>
+                            <DialogTitle>Time Off Request Form</DialogTitle>
+                        </DialogHeader>
+
+                        <TimeOffRequestForm businessId={params.id} />
+                    </DialogContent>
+                </Dialog>
+                
+                
                 <Link href={`/business/${params.id}/availability`} className="w-full">
 
                     <Card className="min-w-[200px] w-full">
