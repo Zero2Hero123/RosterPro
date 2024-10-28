@@ -3,11 +3,11 @@ import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
 
-export async function GET(req: NextRequest,res: NextResponse) {
+export async function GET(req: NextRequest) {
 
     const businessId = req.nextUrl.searchParams.get('id')
     
-    const supabase = createClient()
+    const supabase = await createClient()
     const user = await supabase.auth.getUser()
 
 
