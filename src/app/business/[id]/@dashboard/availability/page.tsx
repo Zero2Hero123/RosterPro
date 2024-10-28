@@ -8,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { toast, useToast } from "@/components/ui/use-toast"
 import { createClient } from "@/utils/supabase/client"
 import { User } from "@supabase/auth-js"
-import { flightRouterStateSchema } from "next/dist/server/app-render/types"
 import { useCallback, useEffect, useReducer, useState, use, ReducerState } from "react";
 
 
