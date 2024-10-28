@@ -44,7 +44,7 @@ export default function TimeOffRequestForm({businessId}: Props){
     <form action={action} className="flex flex-col items-center gap-2">
         <span>How many days?</span>
         <DatePicker/>
-        <Input className="hidden" name="business_id" value={businessId} />
+        <Input className="hidden" name="business_id" value={businessId} readOnly />
 
         <Textarea name="reason" className="bg-black text-white" placeholder="Reason" />
         <Button disabled={status.pending} type="submit" className="bg-white text-black hover:bg-slate-200 w-16">Submit</Button>
