@@ -5,11 +5,11 @@ import { Calendar as Cal} from "@/components/ui/calendar"
 
 
 interface Props {
-    params: {id: string}
+    params: Promise<{id: string}>
 }
 
 
-export default function Calendar({params}:Props){
+export default async function Calendar({params}:Props){
 
 
     return <>
