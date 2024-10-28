@@ -82,7 +82,7 @@ export default async function generate(args: GenerateProps): Promise<GenerateRes
 }
 
 export async function signUp(prevState: any, data: FormData){
-    const client = createClient()
+    const client = await createClient()
 
     const newUserSchema = z.object({
         firstName: z.string(),
@@ -140,7 +140,7 @@ export async function signUp(prevState: any, data: FormData){
 }
 
 export async function logIn(prevState: any, data: FormData){
-    const client = createClient()
+    const client = await createClient()
 
     const returningUser = {
         email: data.get('email') as string,
@@ -166,7 +166,7 @@ export async function logIn(prevState: any, data: FormData){
 }
 
 export async function signOut(){
-    const client = createClient()
+    const client = await createClient()
 
     await client.auth.signOut()
     redirect('/')
@@ -180,7 +180,7 @@ interface Preset {
     title: string
 }
 export async function savePreset(preset: Preset){
-    const client = createClient()
+    const client = await createClient()
 
     const res = await client.from('presets').insert({
         names: preset.names,
@@ -197,7 +197,7 @@ export async function savePreset(preset: Preset){
 }
 
 export async function deletePreset(id: string){
-    const client = createClient()
+    const client = await createClient()
 
     await client.from('presets').delete().eq('id',id)
 
@@ -206,7 +206,7 @@ export async function deletePreset(id: string){
 
 export async function sendEmail(data: FormData){
 
-    const client = createClient()
+    const client = await createClient()
     const user = await client.auth.getUser()
 
     const id = user.data.user?.id
@@ -232,7 +232,7 @@ export async function sendEmail(data: FormData){
 // TODO finish send-message action
 export async function sendMessage(msg: FormData){
 
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const message = {
         author_id: msg.get('author-id') as string,
@@ -259,7 +259,7 @@ export async function sendMessage(msg: FormData){
 
 export async function requestTimeOff(prevState: any,formData: FormData){
 
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const request = {
         from: new Date(Number(formData.get('from'))),
