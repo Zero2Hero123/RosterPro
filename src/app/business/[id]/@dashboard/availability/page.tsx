@@ -9,12 +9,12 @@ import { toast, useToast } from "@/components/ui/use-toast"
 import { createClient } from "@/utils/supabase/client"
 import { User } from "@supabase/auth-js"
 import { flightRouterStateSchema } from "next/dist/server/app-render/types"
-import { useCallback, useEffect, useReducer, useState } from "react"
+import { useCallback, useEffect, useReducer, useState, use } from "react";
 
 
 
 interface Props {
-    params: {id: string}
+    params: Promise<{id: string}>
 }
 
 const daysOfWeek = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday']
@@ -54,7 +54,8 @@ function updateAvailabilty(prev: Availability,action: AvailabilityAction){
     return prev
 }
 
-export default function Availability({ params }: Props){
+export default function Availability(props: Props) {
+    const params = use(props.params);
 
     const supabase = createClient()
 
@@ -175,7 +176,6 @@ export default function Availability({ params }: Props){
     
     
     </>
-
 }
 
 

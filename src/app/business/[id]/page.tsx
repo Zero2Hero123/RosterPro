@@ -3,12 +3,13 @@ import { notFound } from "next/navigation"
 
 
 interface Props {
-    params: {id: string}
+    params: Promise<{id: string}>
 }
 
-export default async function BusinessDashboard({params}: Props){
+export default async function BusinessDashboard(props: Props) {
+    const params = await props.params;
 
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const res = await supabase.from('business').select().eq('id',params.id)
 

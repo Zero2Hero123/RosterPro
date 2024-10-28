@@ -8,7 +8,7 @@ import { User } from "@supabase/supabase-js";
 import { Building, CalendarCog, CalendarDays, ChevronsUpDown, House, LoaderCircle, MessageCircleMore, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 
 
 
@@ -16,95 +16,93 @@ import { useEffect, useState } from "react";
 
 
 
-export default function Layout({
-    children,
-    dashboard,
-    params
-  }: Readonly<{
-    children: React.ReactNode;
-    dashboard: React.ReactNode;
-    params: {id: string}
-  }>) {
+export default function Layout(
+  {params,children,dashboard}: Readonly<{
+      children: React.ReactNode;
+      dashboard: React.ReactNode;
+      params: Promise<{id: string}>
+    }>
+) {
+  const { id } = use(params)
 
-    const supabase = createClient()
-    // TODO finish business dropdown
+  const supabase = createClient()
 
 
-    const [user,setUser] = useState<User | null>(null) 
-    const [listOfBusinesses,setListBusinesses] = useState<any[] | null>([])
-    const [selectedBusiness, setSelected] = useState<any | null>(null)
+  const [user,setUser] = useState<User | null>(null)
+  const [listOfBusinesses,setListBusinesses] = useState<any[] | null>([])
+  const [selectedBusiness, setSelected] = useState<any | null>(null)
 
-    useEffect(() => {
-      supabase.auth.getUser().then(res => {
-        setUser(res.data.user)
-      })
-    },[])
+  useEffect(() => {
+    supabase.auth.getUser().then(res => {
+      setUser(res.data.user)
+    })
+  },[])
 
-    useEffect(() => {
-      supabase.from('business').select().eq('id',params.id)
-      .then(({data, error}) => {
-        if(error) console.warn(error)
+  useEffect(() => {
+    supabase.from('business').select().eq('id',id)
+    .then(({data, error}) => {
+      if(error) console.warn(error)
 
-        setSelected(data && data[0])
+      setSelected(data && data[0])
 
-      })
-      
-      if(!user) return
-      supabase.from('user_businesses').select().eq('user_id',user?.id)
-      .then(({data,error}) => {
-        if(error) console.warn(error)
+    })
+    
+    if(!user) return
+    supabase.from('user_businesses').select().eq('user_id',user?.id)
+    .then(({data,error}) => {
+      if(error) console.warn(error)
 
-        setListBusinesses(data)
-      })
-      
-    },[user])
+      setListBusinesses(data)
+    })
+    
+  },[user])
 
 
 
 
 
 
-    return (
-        <>
-            <main className="flex">
-                <section className="h-[calc(100vh-4rem)] bg-black  lg:basis-[230px] px-3 flex flex-col gap-3">
+  return (
+      <>
+          <main className="flex">
+              <section className="h-[calc(100vh-4rem)] bg-black  lg:basis-[230px] px-3 flex flex-col gap-3">
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button className="hidden md:flex justify-around items-center border border-gray-500 bg-black hover:bg-slate-950"> <span className="grow text-center">{selectedBusiness ? selectedBusiness.name : 'None'}</span> <ChevronsUpDown size={'18'}/> </Button>
-                    </DropdownMenuTrigger>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="hidden md:flex justify-around items-center border border-gray-500 bg-black hover:bg-slate-950"> <span className="grow text-center">{selectedBusiness ? selectedBusiness.name : 'None'}</span> <ChevronsUpDown size={'18'}/> </Button>
+                  </DropdownMenuTrigger>
 
-                    <DropdownMenuContent className="bg-black text-white w-56">
+                  <DropdownMenuContent className="bg-black text-white w-56">
 
-                    {
-                      listOfBusinesses && listOfBusinesses.map(b => <DropdownMenuItem key={'LIST_'+b.business_id} className="p-0"> <BusinessLink businessId={b.business_id} /> </DropdownMenuItem>)
-                    }
+                  {
+                    listOfBusinesses && listOfBusinesses.map(b => <DropdownMenuItem key={'LIST_'+b.business_id} className="p-0"> <BusinessLink businessId={b.business_id} /> </DropdownMenuItem>)
+                  }
 
 
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
-                  <Separator/>
+                <Separator/>
 
-                  <DashboardTab href={`/business/${params.id}`}>  <House/> <span className="grow text-center hidden sm:inline">Home</span> </DashboardTab>
-                  <DashboardTab href={`/business/${params.id}/employees`} > <Users/> <span className="grow text-center hidden sm:inline">Employees</span> </DashboardTab>
-                  <DashboardTab href={`/business/${params.id}/calendar`}> <CalendarDays/> <span className="grow text-center hidden sm:inline">Calendar</span> </DashboardTab>
-                  <DashboardTab href={`/business/${params.id}/chat`}> <MessageCircleMore/> <span className="grow text-center hidden sm:inline">Public Chat</span> </DashboardTab>
-                  
-        
-
-                  <Separator/>
-                  <DashboardTab href={`/business/${params.id}/availability`}> <CalendarCog/> <span className="grow text-center hidden sm:inline">My Availability</span> </DashboardTab>
-                  <DashboardTab href={`/business/${params.id}/settings`}> <Settings /> <span className="grow text-center hidden sm:inline">Settings</span> </DashboardTab>
-
-                </section>
+                <DashboardTab href={`/business/${id}`}>  <House/> <span className="grow text-center hidden sm:inline">Home</span> </DashboardTab>
+                <DashboardTab href={`/business/${id}/employees`} > <Users/> <span className="grow text-center hidden sm:inline">Employees</span> </DashboardTab>
+                <DashboardTab href={`/business/${id}/calendar`}> <CalendarDays/> <span className="grow text-center hidden sm:inline">Calendar</span> </DashboardTab>
+                <DashboardTab href={`/business/${id}/chat`}> <MessageCircleMore/> <span className="grow text-center hidden sm:inline">Public Chat</span> </DashboardTab>
                 
-                
-                <section className="flex justify-start flex-col items-center grow px-2 py-1">{dashboard}</section>
-            </main>
-        </>
-    );
-  }
+      
+
+                <Separator/>
+                <DashboardTab href={`/business/${id}/availability`}> <CalendarCog/> <span className="grow text-center hidden sm:inline">My Availability</span> </DashboardTab>
+                <DashboardTab href={`/business/${id}/settings`}> <Settings /> <span className="grow text-center hidden sm:inline">Settings</span> </DashboardTab>
+
+              </section>
+              
+              
+              <section className="flex justify-start flex-col items-center grow px-2 py-1">{dashboard}</section>
+          </main>
+      </>
+  );
+}
 
 function BusinessLink({businessId}: {businessId: string}){
 

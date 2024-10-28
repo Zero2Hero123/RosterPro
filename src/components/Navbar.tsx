@@ -34,7 +34,7 @@ function getInitials(firstName: string,lastName: string){
 
 const Navbar: React.FC = async () => {
 
-    const client = createClient()
+    const client = await createClient()
     const user = await client.auth.getUser()
 
     const id = user.data.user?.id
