@@ -9,12 +9,12 @@ import { toast, useToast } from "@/components/ui/use-toast"
 import { createClient } from "@/utils/supabase/client"
 import { User } from "@supabase/auth-js"
 import { flightRouterStateSchema } from "next/dist/server/app-render/types"
-import { useCallback, useEffect, useReducer, useState } from "react"
+import { useCallback, useEffect, useReducer, useState, use, AnyActionArg } from "react";
 
 
 
 interface Props {
-    params: {id: string}
+    params: Promise<{id: string}>
 }
 
 const daysOfWeek = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday']
@@ -36,25 +36,26 @@ type DaysEnabled = {
 type AvailabilityAction = {direction: 'from' | 'to', day: string, newTime: string} | {direction: 'SET',days?: null,action: Availability} | {direction: 'SET-DAY', day: string,action: boolean}
 type AvailabilityReducer = (prev: Availability,action: AvailabilityAction) => Availability
 
-function updateAvailabilty(prev: Availability,action: AvailabilityAction){
-    prev = {
-        ...prev
+function updateAvailabilty(prevState: Availability,action: AvailabilityAction){
+    prevState = {
+        ...prevState
     }
 
     if(action.direction == 'SET'){
         return action.action
     } else if(action.direction == 'SET-DAY'){
-        prev[(action.day as keyof Availability)].enabled = action.action
+        prevState[(action.day as keyof Availability)].enabled = action.action
 
-        return prev
+        return prevState
     }
 
-    prev[(action.day as keyof Availability)][action.direction] = action.newTime
+    prevState[(action.day as keyof Availability)][action.direction] = action.newTime
 
-    return prev
+    return prevState
 }
 
-export default function Availability({ params }: Props){
+export default function Availability(props: Props) {
+    const params = use(props.params);
 
     const supabase = createClient()
 
@@ -175,7 +176,6 @@ export default function Availability({ params }: Props){
     
     
     </>
-
 }
 
 

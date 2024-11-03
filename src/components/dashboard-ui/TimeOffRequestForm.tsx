@@ -5,7 +5,7 @@ import DatePicker from "./DatePicker";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom";
 import { useToast } from "../ui/use-toast";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -22,7 +22,7 @@ const initState = {
 
 export default function TimeOffRequestForm({businessId}: Props){
 
-    const [state,action] = useFormState(requestTimeOff,initState)
+    const [state,action] = useActionState(requestTimeOff,initState)
 
     const status = useFormStatus()
     const router = useRouter()

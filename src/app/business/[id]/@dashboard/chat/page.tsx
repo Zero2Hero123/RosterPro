@@ -7,18 +7,19 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { sendMessage } from "@/utils/actions"
 import { createClient } from "@/utils/supabase/client"
 import { User } from "@supabase/supabase-js"
-import { useEffect, useState } from "react"
+import { useEffect, useState, use } from "react";
 
 
 
 
 interface Props {
-    params: {id: string}
+    params: Promise<{id: string}>
 }
 
 
 
-export default function Chat({ params }: Props){
+export default function Chat(props: Props) {
+    const params = use(props.params);
 
     const supabase = createClient()
 
@@ -45,7 +46,7 @@ export default function Chat({ params }: Props){
             .then(u => setUser(u.data.user))
     },[])
 
-    
+
     useEffect(() => {
         if(business){
             supabase.from('messages').select().eq('business_id',business.id)

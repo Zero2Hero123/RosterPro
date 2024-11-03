@@ -1,3 +1,4 @@
+import { useActionState } from "react";
 'use client'
 
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { logIn, signUp } from "@/utils/actions";
 import { useRouter } from "next/navigation";
-import { useFormState } from "react-dom";
 
 const initState = {
     message: ''
@@ -13,9 +13,9 @@ const initState = {
 
 const Auth: React.FC<{}> = () => {
 
-    const [state,signUpAction] = useFormState(signUp,initState)
+    const [state,signUpAction] = useActionState(signUp,initState)
 
-    const [logInState,logInAction] = useFormState(logIn,initState)
+    const [logInState,logInAction] = useActionState(logIn,initState)
 
     const router = useRouter()
 

@@ -16,11 +16,12 @@ import { notFound } from "next/navigation";
 
 
 interface Props {
-    params: {id: string}
+    params: Promise<{id: string}>
 }
 
 
-export default async function Dashboard({params}: Props){
+export default async function Dashboard(props: Props) {
+    const params = await props.params;
 
     const supabase = createClient()
 
