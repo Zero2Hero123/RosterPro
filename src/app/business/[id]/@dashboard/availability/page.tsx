@@ -8,8 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { toast, useToast } from "@/components/ui/use-toast"
 import { createClient } from "@/utils/supabase/client"
 import { User } from "@supabase/auth-js"
-import { flightRouterStateSchema } from "next/dist/server/app-render/types"
-import { useCallback, useEffect, useReducer, useState, use, AnyActionArg } from "react";
+import { useCallback, useEffect, useReducer, useState, use, ReducerState } from "react";
 
 
 
@@ -63,7 +62,7 @@ export default function Availability(props: Props) {
 
     const [showSave,setShowSave] = useState<boolean>(false)
 
-    const [availability,setAvailability] = useReducer<AvailabilityReducer>(updateAvailabilty,{
+    const [availability,setAvailability] = useReducer<Availability,any>(updateAvailabilty,{
         sunday: {from: '',to: '', enabled: false},
         monday: {from: '',to: '', enabled: false},
         tuesday: {from: '',to: '', enabled: false},

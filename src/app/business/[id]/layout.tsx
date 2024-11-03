@@ -5,10 +5,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { Building, CalendarCog, ChevronsUpDown, House, LoaderCircle, MessageCircleMore, Settings, Users } from "lucide-react";
+import { Building, CalendarCog, CalendarDays, ChevronsUpDown, House, LoaderCircle, MessageCircleMore, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, use } from "react"
+import { useEffect, useState, use } from "react";
 
 
 
@@ -17,21 +17,15 @@ import { useEffect, useState, use } from "react"
 
 
 export default function Layout(
-  props: Readonly<{
+  {params,children,dashboard}: Readonly<{
       children: React.ReactNode;
       dashboard: React.ReactNode;
-      params: {id: string}
+      params: Promise<{id: string}>
     }>
 ) {
-  const params = use(props.params)
-
-  const {
-    children,
-    dashboard
-  } = props;
+  const { id } = use(params)
 
   const supabase = createClient()
-  // TODO finish business dropdown
 
 
   const [user,setUser] = useState<User | null>(null)
@@ -45,7 +39,7 @@ export default function Layout(
   },[])
 
   useEffect(() => {
-    supabase.from('business').select().eq('id',params.id)
+    supabase.from('business').select().eq('id',id)
     .then(({data, error}) => {
       if(error) console.warn(error)
 
@@ -90,14 +84,16 @@ export default function Layout(
 
                 <Separator/>
 
-                <DashboardTab href={`/business/${params.id}`}>  <House/> <span className="grow text-center hidden sm:inline">Home</span> </DashboardTab>
-                <DashboardTab href={`/business/${params.id}/employees`} > <Users/> <span className="grow text-center hidden sm:inline">Employees</span> </DashboardTab>
-                <DashboardTab href={`/business/${params.id}/chat`}> <MessageCircleMore/> <span className="grow text-center hidden sm:inline">Public Chat</span> </DashboardTab>
+                <DashboardTab href={`/business/${id}`}>  <House/> <span className="grow text-center hidden sm:inline">Home</span> </DashboardTab>
+                <DashboardTab href={`/business/${id}/employees`} > <Users/> <span className="grow text-center hidden sm:inline">Employees</span> </DashboardTab>
+                <DashboardTab href={`/business/${id}/calendar`}> <CalendarDays/> <span className="grow text-center hidden sm:inline">Calendar</span> </DashboardTab>
+                <DashboardTab href={`/business/${id}/chat`}> <MessageCircleMore/> <span className="grow text-center hidden sm:inline">Public Chat</span> </DashboardTab>
+                
       
 
                 <Separator/>
-                <DashboardTab href={`/business/${params.id}/availability`}> <CalendarCog/> <span className="grow text-center hidden sm:inline">My Availability</span> </DashboardTab>
-                <DashboardTab href={`/business/${params.id}/settings`}> <Settings /> <span className="grow text-center hidden sm:inline">Settings</span> </DashboardTab>
+                <DashboardTab href={`/business/${id}/availability`}> <CalendarCog/> <span className="grow text-center hidden sm:inline">My Availability</span> </DashboardTab>
+                <DashboardTab href={`/business/${id}/settings`}> <Settings /> <span className="grow text-center hidden sm:inline">Settings</span> </DashboardTab>
 
               </section>
               

@@ -21,8 +21,8 @@ const DatePicker = () => {
         <Calendar className="dark bg-black text-white" mode="range" selected={dateRange} onSelect={setRange}/>
         {(dateRange && dateRange.to && dateRange.from) && <span>{format(dateRange.from || '','MMMM dd,yyyy')} to {format(dateRange.to || '','MMMM dd,yyyy')}</span>}
         
-        {dateRange && <Input className="bg-black hidden" name="from" value={dateRange.from?.valueOf()}/>}
-        {dateRange && <Input className="bg-black hidden" name="to" value={dateRange.to?.valueOf()}/>}
+        {dateRange && <Input className="bg-black hidden" readOnly name="from" value={dateRange.from?.valueOf()}/>}
+        {dateRange && <Input className="bg-black hidden" readOnly name="to" value={dateRange.to?.valueOf()}/>}
     </>
 }
 

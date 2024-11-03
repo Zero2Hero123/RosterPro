@@ -17,7 +17,7 @@ interface Props {
 export default async function Employees(props: Props) {
     const params = await props.params;
 
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const {data, error} = await supabase
     .rpc('getbusinessmembers', {

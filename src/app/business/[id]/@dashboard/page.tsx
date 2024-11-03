@@ -23,7 +23,7 @@ interface Props {
 export default async function Dashboard(props: Props) {
     const params = await props.params;
 
-    const supabase = createClient()
+    const supabase = await createClient()
 
     // fetch signined-in user
     const user = await supabase.auth.getUser()

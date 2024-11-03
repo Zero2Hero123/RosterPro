@@ -2,7 +2,7 @@ import { requestFormReset } from "react-dom"
 
 
 interface Props {
-    params: {id: string}
+    params: Promise<{id: string}>
 }
 
 

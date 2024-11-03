@@ -9,7 +9,7 @@ interface Props {
 export default async function BusinessDashboard(props: Props) {
     const params = await props.params;
 
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const res = await supabase.from('business').select().eq('id',params.id)
 
