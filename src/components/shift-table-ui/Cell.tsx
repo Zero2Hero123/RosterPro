@@ -3,7 +3,7 @@ interface Props {
     index: number
 }
 
-const Cell: React.FC<Props> = async ({index}) => {
+const Cell: React.FC<Props> = ({index}) => {
 
 
     return <div data-swapy-slot={index} className="border"></div>
