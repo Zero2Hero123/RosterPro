@@ -96,10 +96,10 @@ export default function Chat(props: Props) {
         </header>
         <section className="bg-[#333333] h-[81vh] md:h-[85vh] w-[100%] flex flex-col">
 
-            <div className="flex flex-col justify-end grow p-2">
+            <div className="flex flex-col gap-2 justify-end grow p-2">
                 {
-                    messages.map(m => 
-                        <Message key={'MSG_'+m.authorId+m.id} businessId={m.business_id} authorId={m.authorId} content={m.content} createdAt={m.createdAt} />
+                    messages.map((m,i) => 
+                        <Message withPersonLabel={(i > 0 ? messages[i-1].author_id != m.author_id : true)} key={'MSG_'+m.authorId+m.id} businessId={m.business_id} authorId={m.author_id} content={m.content} createdAt={m.createdAt} />
                     )
                 }
             </div>
