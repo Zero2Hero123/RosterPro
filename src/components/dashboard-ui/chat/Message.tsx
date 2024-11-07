@@ -45,7 +45,7 @@ const Message = ({content,authorId, withPersonLabel = true}: Props) => {
 
     return <div className={`flex ${authorId == user?.id ? 'justify-end' : 'justify-start'}`}>
 
-        <div className="flex bg-slate-800 text-white p-3 rounded-lg text-sm">
+        <div className={`flex ${authorId == user?.id ? 'bg-black' : 'bg-gray-700'} text-white p-3 rounded-lg text-sm`}>
             {(withPersonLabel && author) && <ProfilePic firstName={author.first_name} lastName={author.last_name} size={10}/>}
             <div className="flex flex-col">
                 {(withPersonLabel && author) && <span>{author.first_name} {author.last_name}</span>}

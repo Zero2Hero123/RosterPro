@@ -91,10 +91,11 @@ export default function Chat(props: Props) {
     // TODO add sendMessage server action
     return <>
     
-        <header>
-            {business ? <span className="text-3xl font-bold ">{business.name}</span> : <Skeleton className="h-[36px] w-[300px]" />}
-        </header>
-        <section className="bg-[#333333] h-[81vh] md:h-[85vh] w-[100%] flex flex-col">
+        
+        <section className="bg-gradient-to-b from-slate-950 to-slate-800  w-[100%] flex flex-col grow">
+            <header className="flex justify-center">
+                {business ? <span className="text-3xl font-bold ">{business.name}</span> : <Skeleton className="h-[36px] w-[300px]" />}
+            </header>
 
             <div className="flex flex-col gap-2 justify-end grow p-2">
                 {

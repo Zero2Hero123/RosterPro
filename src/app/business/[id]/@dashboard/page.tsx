@@ -49,7 +49,7 @@ export default async function Dashboard(props: Props) {
 
     return <>
         <span className="text-3xl font-bold text-center w-[100%]">{currBiz.name}</span>
-        <Link className="hover:cursor-pointer mb-10" href={`/business/${params.id}/employees`}> <span className="flex items-center gap-2"> <Users size={'20'}/> {numMembers.data} {numMembers.data != 1 ? 'Employees' : 'Employee'}</span> </Link>
+        <Link className="hover:cursor-pointer mb-10" href={`/business/${params.id}/employees`}> <span className="flex items-center gap-2"> <Users size={'20'}/> {numMembers.data} {numMembers.data != 1 ? 'People' : 'Person'}</span> </Link>
         {currBiz.owner_id == user.data.user.id && <Invite businessName={currBiz.name} businessId={currBiz.id}/>}
         
         <header className="flex w-full justify-center">
