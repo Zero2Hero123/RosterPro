@@ -1,5 +1,7 @@
 'use client'
 import Cell from "@/components/shift-table-ui/Cell";
+import NameLabel from "@/components/shift-table-ui/NameLabel";
+import NameLabelAdd from "@/components/shift-table-ui/NameLabelAdd";
 import { add, formatDate, sub } from "date-fns"
 import { Span } from "next/dist/trace";
 import { useEffect, useRef } from "react";
@@ -33,7 +35,13 @@ export default function WeeklyScheduler(){
     
     <main className="flex justify-center gap-10 flex-col md:flex-row">
 
-        <div className="print:hidden w-[400px] h-[500px] bg-black border border-white rounded-md ml-10">
+        <div className="print:hidden w-[400px] h-[500px] bg-gradient-to-tr from-slate-800 to-slate-700 shadow-lg rounded-md ml-10 my-5">
+
+
+            <div className="flex p-4 gap-3">
+                <NameLabel name="Hero Emenalom" onToggle={() => console.log} />
+                <NameLabelAdd/>
+            </div>
 
         </div>
 
