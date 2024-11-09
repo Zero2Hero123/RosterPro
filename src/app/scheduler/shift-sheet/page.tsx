@@ -5,12 +5,13 @@ import NameLabel from "@/components/shift-table-ui/NameLabel";
 import NameLabelAdd from "@/components/shift-table-ui/NameLabelAdd";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { generateShifts } from "@/utils/actions";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { add, formatDate, sub } from "date-fns"
 import { ChevronsUpDown } from "lucide-react";
 import { Span } from "next/dist/trace";
-import { useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
 import { createSwapy } from 'swapy'
 
@@ -43,7 +44,7 @@ export default function WeeklyScheduler(){
     const [organizationMembers,setMembers]= useState<any[]>([])
 
 
-
+    const [data,generateShiftAction] = useActionState(generateShifts,{})
 
     useEffect(() => {
 
@@ -85,7 +86,7 @@ export default function WeeklyScheduler(){
         <div className="print:hidden w-[400px] h-[500px] bg-gradient-to-tr from-slate-800 to-slate-700 shadow-lg rounded-md ml-10 my-5">
 
 
-            <div className="flex flex-col gap-2 p-4">
+            <form action={generateShifts} className="flex flex-col gap-2 p-4">
                 <div className="flex justify-center">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -102,13 +103,16 @@ export default function WeeklyScheduler(){
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
-                <div className="flex gap-3 flex-wrap">
+                <div className="flex gap-3 grow flex-wrap">
 
                     {organizationMembers.map(m => <NameLabel key={`Label ${m.id}`} name={`${m.first_name} ${m.last_name}`} onToggle={() => console.log} />)}
 
                     <NameLabelAdd/>
                 </div>
-            </div>
+                <div>
+                    <Button type="submit" className="">Generate</Button>
+                </div>
+            </form>
 
         </div>
 

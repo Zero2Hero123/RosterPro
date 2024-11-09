@@ -57,6 +57,11 @@ function createPrompt(args: GenerateProps){
     return `Generate a schedule. Randomly map the following names, ${args.names.join(', ')} to the following jobs, ${args.jobs.join(', ')} for each day. The schedule should be for ONLY these days in a week, ${args.days.join(', ')} between ${format(args.dateRange.from as Date,'LLL dd yyyy')} to ${format(args.dateRange.to as Date,'LLL dd yyyy')}. Remember, Jobs can only be assigned once! They cannot be repeated for multiple persons! The order in which you assign jobs should also be random. Finally, return the schedule as a list of objects that have the following schema,${JSON.stringify(schema)} in plain raw json. No Extraneous text. Let each object will represent a day.`
 }
 
+function createShiftPrompt(){
+
+    return ''
+}
+
 const openai = new OpenAI({
     apiKey: process.env.API_KEY!
 })
@@ -290,4 +295,25 @@ export async function requestTimeOff(prevState: any,formData: FormData){
     return {
         message: ''
     }
+}
+
+interface ShiftWeek {
+    sunday: {from: string, to: string},
+    monday: {from: string, to: string},
+    tuesday: {from: string, to: string},
+    wednesday: {from: string, to: string},
+    thursday: {from: string, to: string},
+    friday: {from: string, to: string},
+    saturday: {from: string, to: string}
+}
+
+interface ShiftSchedule {
+    [name: string]: ShiftWeek
+}
+
+export async function generateShifts(): Promise<ShiftSchedule>{
+
+    
+
+    return {}
 }
