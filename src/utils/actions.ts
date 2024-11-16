@@ -57,9 +57,18 @@ function createPrompt(args: GenerateProps){
     return `Generate a schedule. Randomly map the following names, ${args.names.join(', ')} to the following jobs, ${args.jobs.join(', ')} for each day. The schedule should be for ONLY these days in a week, ${args.days.join(', ')} between ${format(args.dateRange.from as Date,'LLL dd yyyy')} to ${format(args.dateRange.to as Date,'LLL dd yyyy')}. Remember, Jobs can only be assigned once! They cannot be repeated for multiple persons! The order in which you assign jobs should also be random. Finally, return the schedule as a list of objects that have the following schema,${JSON.stringify(schema)} in plain raw json. No Extraneous text. Let each object will represent a day.`
 }
 
-function createShiftPrompt(){
+const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
+function createShiftPrompt(names: string[],availabilities: any[]){
 
-    return ''
+    const mappedAvails: Record<string,any> = names.map((n,i) => availabilities[i])
+
+
+    // ! this is not mapping properly!!!  'monday undefined'
+    const avails = names.map(n => `${n} is available on ${days.map(d => `${d} from ${days.filter((d: string) => mappedAvails[n][d].enabled).map(d => mappedAvails[n][d].from)} to ${days.filter((d: string) => mappedAvails[n][d].enabled).map(d => mappedAvails[n][d].to)}`)})`) // X person is available on day from fTime to tTime (format)
+
+    console.log(avails)
+
+    return `Generate a schedule with the following names, ${names.join(', ')}. Factor in the following availabilities of each person, ${''}. Return the result in a JSON format, with which name mapped to a list of the shifts. Each index of the list will represent sunday-saturday (0-7) and each index is an object of type {from: number, to: number}, where from is the time their shift starts and to is the time their shift ends. Every persons list always has a length of 7. YOU ONLY OUTPUT JSON. No extraneous text!`
 }
 
 const openai = new OpenAI({
@@ -314,12 +323,34 @@ interface ShiftSchedule {
 export async function generateShifts(prev: any,formData: FormData): Promise<ShiftSchedule>{
     const supabase = await createClient()
 
+    const businessId = formData.get('businessId') as string
+    const enteredNames = (formData.get('names') as string).trim().split(',')
+    console.log(businessId)
+
+
 
     const availabilities = await supabase.from('availability')
+        .select()
+        .eq('business_id',businessId).order('user_id') // get the corresponding availabilities in order of their user_ids (user's id)
+    
+    if(availabilities.count == 0){
+        return {}
+    }
 
-    const names = (formData.get('names') as string).split(',')
+    const names = await supabase.from('profiles').select('first_name,last_name')
+    .in('id',availabilities.data?.map(o => o.user_id) as any[]).order('id') // get the corresponding names in order of their ids (user's id)
+
+    if(!names.data) return {}
+    const namesInOrder = names.data?.filter(n => enteredNames.some(n2 => `${n.first_name} ${n.last_name}` == n2)) // filter to only names that were selected
 
 
+    console.log(namesInOrder)
+
+    
+
+    // const names = (formData.get('names') as string).split(',')
+
+    const prompt = createShiftPrompt(namesInOrder.map(n => `${n.first_name} ${n.last_name}`),availabilities.data as any[])
 
     
 
