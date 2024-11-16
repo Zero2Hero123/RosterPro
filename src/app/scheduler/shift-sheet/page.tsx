@@ -5,6 +5,7 @@ import NameLabel from "@/components/shift-table-ui/NameLabel";
 import NameLabelAdd from "@/components/shift-table-ui/NameLabelAdd";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { generateShifts } from "@/utils/actions";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -42,9 +43,10 @@ export default function WeeklyScheduler(){
     const [selectedBusinessId, setSelectedId] = useState<any | null>(null)
 
     const [organizationMembers,setMembers]= useState<any[]>([])
+    const [trueMembers,setTrueMembers] = useState<Set<any>>(new Set())
 
 
-    const [data,generateShiftAction] = useActionState(generateShifts,{})
+    const [data,generateShiftAction,isPending] = useActionState(generateShifts,{})
 
     useEffect(() => {
 
@@ -73,10 +75,17 @@ export default function WeeklyScheduler(){
         }).then((res) => {
             if(res.error) console.error(res.error.message)
             setMembers(res.data)
+            setTrueMembers(res.data.map((m: any) => `${m.first_name} ${m.last_name}`))
             
         })
 
     },[selectedBusinessId])
+
+
+    useEffect(() => {
+        console.log(trueMembers)
+    },[trueMembers])
+
 
 
     return <>
@@ -86,7 +95,7 @@ export default function WeeklyScheduler(){
         <div className="print:hidden w-[400px] h-[500px] bg-gradient-to-tr from-slate-800 to-slate-700 shadow-lg rounded-md ml-10 my-5">
 
 
-            <form action={generateShifts} className="flex flex-col gap-2 p-4">
+            <form action={generateShiftAction} className="flex flex-col gap-2 p-4">
                 <div className="flex justify-center">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -105,13 +114,15 @@ export default function WeeklyScheduler(){
                 </div>
                 <div className="flex gap-3 grow flex-wrap">
 
-                    {organizationMembers.map(m => <NameLabel key={`Label ${m.id}`} name={`${m.first_name} ${m.last_name}`} onToggle={() => console.log} />)}
+                    {organizationMembers.map(m => <NameLabel key={`Label ${m.id}`} name={`${m.first_name} ${m.last_name}`} onToggle={(enabled) => enabled ? setTrueMembers(prev => new Set(prev).add(`${m.first_name} ${m.last_name}`)) : setTrueMembers(prev => {prev.delete(`${m.first_name} ${m.last_name}`); return new Set(prev)})} />)}
 
                     <NameLabelAdd/>
                 </div>
                 <div>
-                    <Button type="submit" className="">Generate</Button>
+                    <Button disabled={isPending} type="submit" className="">Generate</Button>
                 </div>
+                <Input readOnly name={`names`} value={[...trueMembers].join(',')} className="hidden" />
+                <Input readOnly name={`businessId`} value={selectedBusinessId} className="hidden" />
             </form>
 
         </div>

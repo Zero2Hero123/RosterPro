@@ -311,7 +311,15 @@ interface ShiftSchedule {
     [name: string]: ShiftWeek
 }
 
-export async function generateShifts(): Promise<ShiftSchedule>{
+export async function generateShifts(prev: any,formData: FormData): Promise<ShiftSchedule>{
+    const supabase = await createClient()
+
+
+    const availabilities = await supabase.from('availability')
+
+    const names = (formData.get('names') as string).split(',')
+
+
 
     
 
