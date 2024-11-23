@@ -10,7 +10,7 @@ const Cell: React.FC<Props> = ({children}) => {
 
     // data-swapy-slot={index}
 
-    return <div className="border text-black">{children}</div>
+    return <div className="border text-black flex justify-center">{children}</div>
 }
 
 

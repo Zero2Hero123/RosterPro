@@ -367,7 +367,7 @@ export async function generateShifts(prev: any,formData: FormData): Promise<Shif
     const prompt = createShiftPrompt(namesInOrder.map(n => `${n.first_name} ${n.last_name}`),availabilities.data as any[])
     console.log('PROMPT: ',prompt)
 
-    const shiftSystemRole = "You are the intelligent robot manager of a organization,  you are in charge of designing schedules for your organization to schedule for your workers to know when and how long they work. Assume times are in military time. You always output JSON and ONLY JSON output. No extraneous text."
+    const shiftSystemRole = "You are the intelligent robot manager of a organization,  you are in charge of designing schedules for your organization to schedule for your workers to know when and how long they work. Assume times are in military time. You ONLY schedule people on days they are available unless told otherwise. Any days a person isn't available is set to {from: 0,to: 0} You always output JSON and ONLY JSON output. No extraneous text."
 
     const res = await openai.chat.completions.create({
         model: 'gpt-3.5-turbo',

@@ -53,7 +53,7 @@ export default async function Dashboard(props: Props) {
         {currBiz.owner_id == user.data.user.id && <Invite businessName={currBiz.name} businessId={currBiz.id}/>}
         
         <header className="flex w-full justify-center">
-            <ProfilePic firstName={profile.first_name} lastName={profile.last_name} size={20} />
+            <ProfilePic firstName={profile.first_name} lastName={profile.last_name}  />
             <div className="flex flex-col">
                 
                 <span className="text-md md:text-xl">Welcome,</span>

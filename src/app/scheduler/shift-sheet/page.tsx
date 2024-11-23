@@ -22,9 +22,6 @@ export default function WeeklyScheduler(){
 
     let startDate = new Date()
 
-    let arr = new Array(312)
-    arr.fill(1)
-
     const container = useRef<HTMLDivElement>(null)
     // useEffect(() => {
     //     const swapy = createSwapy(container.current,{
@@ -48,6 +45,8 @@ export default function WeeklyScheduler(){
 
 
     const [data,generateShiftAction,isPending] = useActionState(generateShifts,{generated: false, schedule: null})
+    const arr = new Array(40)
+    arr.fill(1)
 
     useEffect(() => {
 
@@ -144,7 +143,11 @@ export default function WeeklyScheduler(){
                 <span className="text-sm font-medium text-center"> Saturday <br/> {formatDate(new Date(),"M/dd")}</span>
                 
                 {
-                    data.generated ? [...trueMembers].map((v,i) => <TimeSheetRow key={`ROW_${i}`} personName={v} avail={data.generated ? data.schedule[v] : []}/>) : arr.map((v,i) => <Cell key={'cell'+i} />)
+                    data.generated ? [...trueMembers].map((v,i) => {arr.pop(); return <TimeSheetRow key={`ROW_${i}`} asPlaceHolder={false} personName={v} avail={data.generated ? data.schedule[v] : []}/>}) : arr.map((v,i) => <TimeSheetRow asPlaceHolder={true} key={'row' + i} personName={""} avail={[]} />)
+                }
+
+                {
+                    data.generated && arr.map((v,i) => <TimeSheetRow asPlaceHolder={true} key={'row' + i} personName={""} avail={[]} />)
                 }
                 
             </div>
