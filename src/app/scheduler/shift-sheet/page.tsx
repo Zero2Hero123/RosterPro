@@ -3,6 +3,7 @@ import BusinessLink from "@/components/dashboard-ui/BusinessLink";
 import Cell from "@/components/shift-table-ui/Cell";
 import NameLabel from "@/components/shift-table-ui/NameLabel";
 import NameLabelAdd from "@/components/shift-table-ui/NameLabelAdd";
+import TimeSheetRow from "@/components/shift-table-ui/TimeSheetRow";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -25,13 +26,13 @@ export default function WeeklyScheduler(){
     arr.fill(1)
 
     const container = useRef<HTMLDivElement>(null)
-    useEffect(() => {
-        const swapy = createSwapy(container.current,{
-            animation: 'dynamic'
-        })
+    // useEffect(() => {
+    //     const swapy = createSwapy(container.current,{
+    //         animation: 'dynamic'
+    //     })
 
-        swapy.enable(true)
-    })
+    //     swapy.enable(true)
+    // })
 
 
 
@@ -43,10 +44,10 @@ export default function WeeklyScheduler(){
     const [selectedBusinessId, setSelectedId] = useState<any | null>(null)
 
     const [organizationMembers,setMembers]= useState<any[]>([])
-    const [trueMembers,setTrueMembers] = useState<Set<any>>(new Set())
+    const [trueMembers,setTrueMembers] = useState<Set<any>>(new Set()) // organization members who should be included in the timesheet
 
 
-    const [data,generateShiftAction,isPending] = useActionState(generateShifts,{})
+    const [data,generateShiftAction,isPending] = useActionState(generateShifts,{generated: false, schedule: null})
 
     useEffect(() => {
 
@@ -122,7 +123,7 @@ export default function WeeklyScheduler(){
                     <Button disabled={isPending} type="submit" className="">Generate</Button>
                 </div>
                 <Input readOnly name={`names`} value={[...trueMembers].join(',')} className="hidden" />
-                <Input readOnly name={`businessId`} value={selectedBusinessId} className="hidden" />
+                <Input readOnly name={`businessId`} value={selectedBusinessId ?? ''} className="hidden" />
             </form>
 
         </div>
@@ -131,7 +132,7 @@ export default function WeeklyScheduler(){
         {/* Document Component */}
         <div className="bg-white p-4 text-black w-[65%] max-w-[800px] print:w-[850px] print:h-[952px] aspect-[17/22] flex justify-center mr-10">
 
-            <div ref={container} className="grid grid-rows-40 grid-cols-8">
+            <div ref={container} className={`grid grid-rows-40 grid-cols-8`}>
 
                 {/* Days of the Week */}
                 <span className="text-sm font-medium text-center col-start-2"> Sunday <br/> {formatDate(new Date(),"M/dd")}</span>
@@ -143,7 +144,7 @@ export default function WeeklyScheduler(){
                 <span className="text-sm font-medium text-center"> Saturday <br/> {formatDate(new Date(),"M/dd")}</span>
                 
                 {
-                    arr.map((v,i) => <Cell key={'cell_'+i} index={i} />)
+                    data.generated ? [...trueMembers].map((v,i) => <TimeSheetRow key={`ROW_${i}`} personName={v} avail={data.generated ? data.schedule[v] : []}/>) : arr.map((v,i) => <Cell key={'cell'+i} />)
                 }
                 
             </div>

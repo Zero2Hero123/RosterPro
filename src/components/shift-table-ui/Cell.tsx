@@ -1,12 +1,16 @@
 'use client'
+
+import { ReactNode } from "react";
+
 interface Props {
-    index: number
+    children?: ReactNode
 }
 
-const Cell: React.FC<Props> = ({index}) => {
+const Cell: React.FC<Props> = ({children}) => {
 
+    // data-swapy-slot={index}
 
-    return <div data-swapy-slot={index} className="border"></div>
+    return <div className="border text-black">{children}</div>
 }
 
 

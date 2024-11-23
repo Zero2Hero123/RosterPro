@@ -62,13 +62,26 @@ function createShiftPrompt(names: string[],availabilities: any[]){
 
     const mappedAvails: Record<string,any> = names.map((n,i) => availabilities[i])
 
+    const trueMap: Map<string,any> = new Map()
 
-    // ! this is not mapping properly!!!  'monday undefined'
-    const avails = names.map(n => `${n} is available on ${days.map(d => `${d} from ${days.filter((d: string) => mappedAvails[n][d].enabled).map(d => mappedAvails[n][d].from)} to ${days.filter((d: string) => mappedAvails[n][d].enabled).map(d => mappedAvails[n][d].to)}`)})`) // X person is available on day from fTime to tTime (format)
+    for(let i = 0; i < names.length; i++){
+        trueMap.set(names[i],mappedAvails[i])
+    }
 
-    console.log(avails)
+    let avails: string[] = [] // store each person's availability in a sentence
 
-    return `Generate a schedule with the following names, ${names.join(', ')}. Factor in the following availabilities of each person, ${''}. Return the result in a JSON format, with which name mapped to a list of the shifts. Each index of the list will represent sunday-saturday (0-7) and each index is an object of type {from: number, to: number}, where from is the time their shift starts and to is the time their shift ends. Every persons list always has a length of 7. YOU ONLY OUTPUT JSON. No extraneous text!`
+    for(let name of names){
+        let str = `${name} is available on `
+
+        for(let d of days.filter(d => trueMap.get(name)[d].enabled)){
+            const currDay = trueMap.get(name)[d]
+
+            str += `${d} from ${currDay.from} to ${currDay.to}, `
+        }
+        avails.push(str)
+    }
+
+    return `Generate a schedule with the following names, ${names.join(', ')}. Factor in the following availabilities of each person, ${avails.join('')}. Return the result in a JSON format, with which name mapped to a list of the shifts. Each index of the lists will represent sunday-saturday (0-7) and each index is an object of type {from: number, to: number}, where "from" is the time their shift starts and "to" is the time their shift ends. Every person's list always has a length of 7 because there are 7 days in a week. YOU ONLY OUTPUT JSON. No extraneous text!`
 }
 
 const openai = new OpenAI({
@@ -78,7 +91,6 @@ const openai = new OpenAI({
 export default async function generate(args: GenerateProps): Promise<GenerateResponse> {
 
     const prompt = createPrompt(args)
-    console.log('PROMPT: ',prompt)
 
     const res = await openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
@@ -306,7 +318,7 @@ export async function requestTimeOff(prevState: any,formData: FormData){
     }
 }
 
-interface ShiftWeek {
+export interface ShiftWeek {
     sunday: {from: string, to: string},
     monday: {from: string, to: string},
     tuesday: {from: string, to: string},
@@ -317,10 +329,12 @@ interface ShiftWeek {
 }
 
 interface ShiftSchedule {
-    [name: string]: ShiftWeek
+    [name: string]: {from: string, to: string}[]
 }
 
-export async function generateShifts(prev: any,formData: FormData): Promise<ShiftSchedule>{
+type ShiftScheduleReturnType = {schedule: ShiftSchedule, generated: true} | {schedule: null, generated: false}
+
+export async function generateShifts(prev: any,formData: FormData): Promise<ShiftScheduleReturnType>{
     const supabase = await createClient()
 
     const businessId = formData.get('businessId') as string
@@ -334,25 +348,41 @@ export async function generateShifts(prev: any,formData: FormData): Promise<Shif
         .eq('business_id',businessId).order('user_id') // get the corresponding availabilities in order of their user_ids (user's id)
     
     if(availabilities.count == 0){
-        return {}
+        return {generated: false, schedule: null}
     }
 
     const names = await supabase.from('profiles').select('first_name,last_name')
     .in('id',availabilities.data?.map(o => o.user_id) as any[]).order('id') // get the corresponding names in order of their ids (user's id)
 
-    if(!names.data) return {}
+    if(!names.data) return {generated: false, schedule: null}
     const namesInOrder = names.data?.filter(n => enteredNames.some(n2 => `${n.first_name} ${n.last_name}` == n2)) // filter to only names that were selected
 
 
-    console.log(namesInOrder)
+    // console.log(namesInOrder)
 
     
 
     // const names = (formData.get('names') as string).split(',')
 
     const prompt = createShiftPrompt(namesInOrder.map(n => `${n.first_name} ${n.last_name}`),availabilities.data as any[])
+    console.log('PROMPT: ',prompt)
 
-    
+    const shiftSystemRole = "You are the intelligent robot manager of a organization,  you are in charge of designing schedules for your organization to schedule for your workers to know when and how long they work. Assume times are in military time. You always output JSON and ONLY JSON output. No extraneous text."
 
-    return {}
+    const res = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: [
+            {role: 'system', content: shiftSystemRole},
+            {role: 'user', content: prompt}
+        ]
+    })
+
+    const timeSheet = JSON.parse(res.choices[0].message.content as string)
+
+    console.log(timeSheet)
+
+    return {
+        schedule: timeSheet as ShiftSchedule,
+        generated: true
+    }
 }
