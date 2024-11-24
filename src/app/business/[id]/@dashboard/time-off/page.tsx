@@ -1,6 +1,6 @@
-
+'use server'
+import Approval from "@/components/time-off-ui/Approval"
 import { Badge } from "@/components/ui/badge"
-import { Calendar as Cal} from "@/components/ui/calendar"
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { createClient } from "@/utils/supabase/server"
@@ -30,7 +30,7 @@ export default async function TimeOffPage({params}:Props){
         notFound()
     }
 
-    const res = await supabase.from('time_off_request')
+    const res = await supabase.from('time_off_request') // time-off requests for this organization
         .select()
         .eq('business_id',id)
     
@@ -41,8 +41,9 @@ export default async function TimeOffPage({params}:Props){
     const everyone = res.data
     const you = everyone.filter(t => t.user_id === currUser.data.user?.id)
 
-    console.log('me',you)
-    console.log('everyone',everyone)
+    const changes = supabase.channel('table-db-changes').on('postgres_changes',{event: '*',schema: 'public',table: 'time_off_request'},(data) => {
+        console.log(data)
+    }).subscribe()
 
 
     return <>
@@ -52,13 +53,14 @@ export default async function TimeOffPage({params}:Props){
                     <TabsTrigger value="everyone">Everyone</TabsTrigger>
                 </TabsList>
 
-                <TabsContent className="flex flex-wrap gap-3 overflow-y-scroll h-[86vh]" value="you">
+                <TabsContent className="flex flex-wrap gap-1 overflow-y-scroll h-[86vh]" value="you">
 
                     {you.map(t => <Card className="pt-3 px-1 h-40" key={`TIME_OFF_${t.id}`}>
                         <CardTitle className="font-medium">{currUserProfile.data[0].first_name} {currUserProfile.data[0].last_name}</CardTitle>
                         <CardContent>{formatDate(t.from,"MMMM dd, yyyy")} to {formatDate(t.to,"MMMM dd, yyyy")}</CardContent>
-                        <CardFooter>
+                        <CardFooter className="flex justify-between">
                             {t.approved ? <Badge variant={'outline'}><Check size={14}/>  Approved</Badge> : <Badge className="flex gap-1" variant={'secondary'}> <Clock size={14}/> Awaiting Approval</Badge>}
+                            <Approval requestId={t.id}/>
                         </CardFooter>
                     </Card>)}
 
