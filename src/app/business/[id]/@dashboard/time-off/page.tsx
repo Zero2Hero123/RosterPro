@@ -1,7 +1,9 @@
 'use server'
 import Approval from "@/components/time-off-ui/Approval"
+import RequestCard from "@/components/time-off-ui/RequestCard"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card"
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { createClient } from "@/utils/supabase/server"
 import { TabsContent } from "@radix-ui/react-tabs"
@@ -13,13 +15,17 @@ import { notFound } from "next/navigation"
 
 
 interface Props {
-    params: Promise<{id: string}>
+    params: Promise<{id: string}>,
+    searchParams: Promise<{p: string}>
 }
 
 
-export default async function TimeOffPage({params}:Props){
+export default async function TimeOffPage({params,searchParams}:Props){
 
     const { id } = await params
+    const { p } = await searchParams
+    
+    const currPage = Number(p) || 1
 
     const supabase = await createClient()
 
@@ -30,48 +36,65 @@ export default async function TimeOffPage({params}:Props){
         notFound()
     }
 
-    const res = await supabase.from('time_off_request') // time-off requests for this organization
+    const resForEveryone = await supabase.from('time_off_request') // time-off requests for this organization
         .select()
-        .eq('business_id',id)
+        .eq('business_id',id).range(1*currPage,16*currPage)
     
-    if(res.error){
-        console.error(res.error.message)
+    const resForIndividual = await supabase.from('time_off_request') // time-off requests for this organization
+        .select()
+        .eq('business_id',id).eq('user_id',currUser.data.user?.id).range((currPage-1)*15,(currPage-1)+(currPage*15))
+    
+    if(resForEveryone.error){
+        console.error(resForEveryone.error.message)
+        notFound()
+    } else if(resForIndividual.error) {
+        console.error(resForIndividual.error.message)
         notFound()
     }
-    const everyone = res.data
-    const you = everyone.filter(t => t.user_id === currUser.data.user?.id)
 
-    const changes = supabase.channel('table-db-changes').on('postgres_changes',{event: '*',schema: 'public',table: 'time_off_request'},(data) => {
-        console.log(data)
-    }).subscribe()
+
+    const everyone = resForEveryone.data
+    const you = resForIndividual.data
 
 
     return <>
-        <Tabs className="dark flex flex-col items-center" defaultValue="you">
-                <TabsList>
-                    <TabsTrigger value='you'>You</TabsTrigger>
-                    <TabsTrigger value="everyone">Everyone</TabsTrigger>
-                </TabsList>
+        <Tabs className="dark flex flex-col items-center gap-2 " defaultValue="you">
+            <TabsList>
+                <TabsTrigger value='you'>You</TabsTrigger>
+                <TabsTrigger value="everyone">Everyone</TabsTrigger>
+            </TabsList>
 
-                <TabsContent className="flex flex-wrap gap-1 overflow-y-scroll h-[86vh]" value="you">
+            <div className="basis-[75vh] overflow-y-scroll">
+                <TabsContent className="flex flex-wrap gap-2" value="you">
 
-                    {you.map(t => <Card className="pt-3 px-1 h-40" key={`TIME_OFF_${t.id}`}>
-                        <CardTitle className="font-medium">{currUserProfile.data[0].first_name} {currUserProfile.data[0].last_name}</CardTitle>
-                        <CardContent>{formatDate(t.from,"MMMM dd, yyyy")} to {formatDate(t.to,"MMMM dd, yyyy")}</CardContent>
-                        <CardFooter className="flex justify-between">
-                            {t.approved ? <Badge variant={'outline'}><Check size={14}/>  Approved</Badge> : <Badge className="flex gap-1" variant={'secondary'}> <Clock size={14}/> Awaiting Approval</Badge>}
-                            <Approval requestId={t.id}/>
-                        </CardFooter>
-                    </Card>)}
+                    {you.map(t => <RequestCard key={`TIME_OFF_${t.id}`} t={t}/>)}
 
                 </TabsContent>
 
-                <TabsContent value="everyone">
+                <TabsContent className="flex flex-wrap gap-2" value="everyone">
 
-                    everyone
+                    {everyone.map(t => <RequestCard key={`TIME_OFF_${t.id}`} t={t}/>)}
 
                 </TabsContent>
-            </Tabs>
+            </div>
+        </Tabs>
+        <Pagination className="h-10">
+            <PaginationContent>
+                <PaginationItem>
+                    <PaginationPrevious href={`?p=${currPage == 1 ? 1 : currPage-1}`} />
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationLink href="?p=1">1</PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationEllipsis />
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationNext href={`?p=${currPage+1}`} />
+                </PaginationItem>
+            </PaginationContent>
+        </Pagination>
+
     
     </>
 }

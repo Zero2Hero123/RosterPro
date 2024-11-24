@@ -3,14 +3,15 @@
 import { Check, CircleOff, X } from "lucide-react"
 import { Button } from "../ui/button"
 import { createClient } from "@/utils/supabase/client"
-import { useTransition } from "react"
+import { Dispatch, SetStateAction, useTransition } from "react"
 
 
 interface Props {
     requestId: string // time off request id
+    setApproved: Dispatch<SetStateAction<'APPROVED' | 'AWAITING' | 'DENIED'>>
 }
 
-export default function Approval({requestId}: Props){
+export default function Approval({requestId,setApproved}: Props){
 
     const supabase = createClient()
 
@@ -21,12 +22,14 @@ export default function Approval({requestId}: Props){
 
         startTransition(() => {
             supabase.from('time_off_request').update({
-                approved: true
+                approved: 'APPROVED'
             }).eq('id',requestId)
             .then(res => {
                 if(res.error){
                     console.error(res.error)
+                    return
                 }
+                setApproved('APPROVED')
             })
         })
         
@@ -36,12 +39,14 @@ export default function Approval({requestId}: Props){
         
         startTransition(() => {
             supabase.from('time_off_request').update({
-                approved: false
+                approved: 'DENIED'
             }).eq('id',requestId)
             .then(res => {
                 if(res.error){
                     console.error(res.error)
+                    return
                 }
+                setApproved('DENIED')
             })
         })
 
