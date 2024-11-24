@@ -86,7 +86,7 @@ export default function Layout(
 
                 <DashboardTab href={`/business/${id}`}>  <House/> <span className="grow text-center hidden sm:inline">Home</span> </DashboardTab>
                 <DashboardTab href={`/business/${id}/employees`} > <Users/> <span className="grow text-center hidden sm:inline">Employees</span> </DashboardTab>
-                <DashboardTab href={`/business/${id}/calendar`}> <CalendarDays/> <span className="grow text-center hidden sm:inline">Calendar</span> </DashboardTab>
+                <DashboardTab href={`/business/${id}/time-off`}> <CalendarDays/> <span className="grow text-center hidden sm:inline">Time Off</span> </DashboardTab>
                 <DashboardTab href={`/business/${id}/chat`}> <MessageCircleMore/> <span className="grow text-center hidden sm:inline">Public Chat</span> </DashboardTab>
                 
       
