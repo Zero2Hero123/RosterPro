@@ -38,7 +38,7 @@ export default async function TimeOffPage({params,searchParams}:Props){
 
     const resForEveryone = await supabase.from('time_off_request') // time-off requests for this organization
         .select()
-        .eq('business_id',id).range(1*currPage,16*currPage)
+        .eq('business_id',id).range((currPage-1)*15,(currPage-1)+(currPage*15))
     
     const resForIndividual = await supabase.from('time_off_request') // time-off requests for this organization
         .select()
@@ -73,7 +73,7 @@ export default async function TimeOffPage({params,searchParams}:Props){
 
                 <TabsContent className="flex flex-wrap gap-2" value="everyone">
 
-                    {everyone.map(t => <RequestCard key={`TIME_OFF_${t.id}`} t={t}/>)}
+                    {everyone.map(t => <RequestCard key={`TIME_OFF_${t.id}_everyone`} t={t}/>)}
 
                 </TabsContent>
             </div>
