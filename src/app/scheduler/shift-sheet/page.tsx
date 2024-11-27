@@ -11,7 +11,7 @@ import { generateShifts, getThisSunday } from "@/utils/actions";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { add, addDays, formatDate, sub } from "date-fns"
-import { ChevronLeft, ChevronRight, ChevronsUpDown, SquareSlash } from "lucide-react";
+import { Building2Icon, ChevronLeft, ChevronRight, ChevronsUpDown, Loader2Icon, Printer, SquareSlash } from "lucide-react";
 import { Span } from "next/dist/trace";
 import { MouseEvent, useActionState, useEffect, useRef, useState } from "react";
 
@@ -171,17 +171,24 @@ export default function WeeklyScheduler(){
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
+                {
+                    !selectedBusinessId && <div className="flex justify-center">
+                        <span>No Organization Selected</span>
+                    </div>
+                }
                 <div className="flex gap-3 grow flex-wrap">
 
                     {organizationMembers.map(m => <NameLabel key={`Label ${m.id}`} name={`${m.first_name} ${m.last_name}`} onToggle={(enabled) => enabled ? setTrueMembers(prev => new Set(prev).add(`${m.first_name} ${m.last_name}`)) : setTrueMembers(prev => {prev.delete(`${m.first_name} ${m.last_name}`); return new Set(prev)})} />)}
 
-                    <NameLabelAdd/>
+                    {selectedBusinessId && <NameLabelAdd/>}
                 </div>
-                <div>
-                    <Button disabled={isPending} type="submit" className="">Generate</Button>
+                <div className="flex justify-center py-2 gap-2">
+                    <Button disabled={isPending || !selectedBusinessId} type="submit" className="">{isPending ? <Loader2Icon className="animate-spin"/> : 'Generate'}</Button>
+                    <Button onClick={() => window.print()} type='button' disabled={isPending || !data.generated} size={'icon'}> <Printer/> </Button>
                 </div>
                 <Input readOnly name={`names`} value={[...trueMembers].join(',')} className="hidden" />
                 <Input readOnly name={`businessId`} value={selectedBusinessId ?? ''} className="hidden" />
+                <Input readOnly type='string' name={`startDate`} value={week.length > 0 ? week[0].toISOString() : ''} className="hidden" />
             </form>
 {/* 
             <form className="flex flex-col gap-2 p-4">
@@ -196,8 +203,8 @@ export default function WeeklyScheduler(){
         {/* Document Component */}
         <div className="bg-white p-4 relative text-black w-[65%] max-w-[800px] print:w-[850px] print:h-[952px] aspect-[17/22] flex justify-center mr-10">
 
-            <Button onClick={shiftLeft} className="absolute left-10 bg-white hover:bg-slate-200" size={'icon'}> <ChevronLeft color="black"/> </Button>
-            <Button onClick={shiftRight} className="absolute right-10 bg-white hover:bg-slate-200" size={'icon'}> <ChevronRight color="black"/> </Button>
+            <Button onClick={shiftLeft} className="print:hidden absolute left-2 bg-transparent hover:bg-slate-200 bg-none" size={'icon'}> <ChevronLeft color="black"/> </Button>
+            <Button onClick={shiftRight} className="print:hidden absolute right-2 bg-transparent hover:bg-slate-200 bg-none" size={'icon'}> <ChevronRight color="black"/> </Button>
             
             
             <div ref={container} className={`grid grid-rows-40 grid-cols-8`}>

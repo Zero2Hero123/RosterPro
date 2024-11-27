@@ -1,10 +1,11 @@
 'use client'
 
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
 import Cell from "./Cell"
 
 type Props  = {
     personName: string,
-    avail: {from: string, to: string}[]
+    avail: ({leave: false, from: string, to: string} | {leave: true, from: null, to: null})[]
     
     asPlaceHolder: false
 } | {
@@ -33,16 +34,19 @@ export default function TimeSheetRow({personName,avail,asPlaceHolder = false}: P
 
     const [first,last] = personName.split(' ')
     return <>
-    
-        <Cell>{first} {last.substring(0,1)}</Cell>
-        <Cell>{parseTime(avail[0].from)} - {parseTime(avail[0].to)}</Cell>  {/*Sunday*/}
-        <Cell>{parseTime(avail[1].from)} - {parseTime(avail[1].to)}</Cell>  {/*Monday*/}
-        <Cell>{parseTime(avail[2].from)} - {parseTime(avail[2].to)}</Cell>  {/*Tuesday*/}
-        <Cell>{parseTime(avail[3].from)} - {parseTime(avail[3].to)}</Cell>  {/*Wednesday*/}
-        <Cell>{parseTime(avail[4].from)} - {parseTime(avail[4].to)}</Cell>  {/*Thursday*/}
-        <Cell>{parseTime(avail[5].from)} - {parseTime(avail[5].to)}</Cell>  {/*Friday*/} 
-        <Cell>{parseTime(avail[6].from)} - {parseTime(avail[6].to)}</Cell>  {/*Saturday*/}
-    
+
+        <TooltipProvider>
+
+            <Cell>{first} {last.substring(0,1)}</Cell>
+            <Cell>{avail[0].leave ? <TimeOffTag/> : `${parseTime(avail[0].from)} - ${parseTime(avail[0].to)}`}</Cell>   {/*Sunday*/}
+            <Cell>{avail[1].leave ? <TimeOffTag/> : `${parseTime(avail[1].from)} - ${parseTime(avail[1].to)}`}</Cell>   {/*Monday*/}
+            <Cell>{avail[2].leave ? <TimeOffTag/> : `${parseTime(avail[2].from)} - ${parseTime(avail[2].to)}`}</Cell>   {/*Tuesday*/}
+            <Cell>{avail[3].leave ? <TimeOffTag/> : `${parseTime(avail[3].from)} - ${parseTime(avail[3].to)}`}</Cell>   {/*Wednesday*/}
+            <Cell>{avail[4].leave ? <TimeOffTag/> : `${parseTime(avail[4].from)} - ${parseTime(avail[4].to)}`}</Cell>   {/*Thursday*/}
+            <Cell>{avail[5].leave ? <TimeOffTag/> : `${parseTime(avail[5].from)} - ${parseTime(avail[5].to)}`}</Cell>   {/*Friday*/} 
+            <Cell>{avail[6].leave ? <TimeOffTag/> : `${parseTime(avail[6].from)} - ${parseTime(avail[6].to)}`}</Cell>  {/*Saturday*/}
+
+        </TooltipProvider>
     </>
 }
 
@@ -68,4 +72,17 @@ function parseTime(time: string,minutes: string = '00'): string {
     // console.log(`${timeAsInt}:00 ${isAM ? 'am' : 'pm'}`)
 
     return `${timeAsInt}${minutes == '00' ? '' : `${minutes}`}${isAM ? 'am' : 'pm'}`
+}
+
+function TimeOffTag(){
+    
+    return <Tooltip>
+        <TooltipTrigger asChild>
+            <span className="font-semibold hover:cursor-help">T</span>
+        </TooltipTrigger>
+
+        <TooltipContent>
+            <span>Time Off</span>
+        </TooltipContent>
+    </Tooltip>
 }

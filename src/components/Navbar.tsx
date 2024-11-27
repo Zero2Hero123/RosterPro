@@ -70,7 +70,7 @@ const Navbar: React.FC = async () => {
             {myProfile && <div className="flex items-center">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button className="flex justify-around items-center border border-gray-500 bg-black hover:bg-slate-950 gap-2"> <span className="grow text-center hidden md:inline"> Go to Business </span> <Building2 />  </Button>
+                        <Button className="flex justify-around items-center border border-gray-500 bg-black hover:bg-slate-950 gap-2"> <span className="grow text-center hidden md:inline"> Dashboard </span> <Building2 />  </Button>
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent className="bg-black text-white w-56">
