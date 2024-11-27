@@ -269,7 +269,7 @@ export async function sendEmail(data: FormData){
     const email = data.get('email') as string
 
     const res = await resend.emails.send({
-        from: 'RosterPro <onboarding@resend.dev>',
+        from: 'roster@rosterprofessional.com',
         to: [email],
         subject: 'Invite Recieved',
         react: EmailInvite({name: myProfile.first_name+' '+myProfile.last_name,businessName: data.get('bizName') as string,id: data.get('bizId') as string})
