@@ -29,6 +29,7 @@ export default function RequestCard({t}: Props){
     const toast = useToast()
     const router = useRouter()
 
+
     useEffect(() => {
         supabase.from('profiles').select().eq('id',t.user_id)
             .then(res => {
@@ -76,7 +77,7 @@ export default function RequestCard({t}: Props){
             {requestee ? <CardTitle className="font-medium flex justify-between pr-3">
                 <span>{requestee.first_name} {requestee.last_name}</span>
                 
-                <Popover>
+                {requestee.id === t.user_id && <Popover>
                     <PopoverTrigger asChild>
                         {requestee.id == t.user_id && <Button size='icon' variant={'ghost'}><Ellipsis/></Button>}
                     </PopoverTrigger>
@@ -84,7 +85,7 @@ export default function RequestCard({t}: Props){
                     <PopoverContent className="bg-black bg-opacity-50 border-none w-auto">
                         <Button onClick={deleteTimeOff} variant={'destructive'}>Delete</Button>
                     </PopoverContent>
-                </Popover>
+                </Popover>}
 
 
                 </CardTitle> : <Skeleton className="h-6 m-1"/>}

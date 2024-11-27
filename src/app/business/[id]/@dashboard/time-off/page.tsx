@@ -64,7 +64,7 @@ export default async function TimeOffPage({params,searchParams}:Props){
                 <TabsTrigger value="everyone">Everyone</TabsTrigger>
             </TabsList>
 
-            <div className="basis-[75vh] overflow-y-scroll">
+            <div className="basis-[75vh]">
                 <TabsContent className="flex flex-wrap gap-2" value="you">
 
                     {you.map(t => <RequestCard key={`TIME_OFF_${t.id}`} t={t}/>)}

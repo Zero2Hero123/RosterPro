@@ -1,9 +1,12 @@
+import RemoveUser from "@/components/RemoveUser";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { toast, useToast } from "@/components/ui/use-toast";
 import { createClient } from "@/utils/supabase/server";
-import { UserRoundPlus } from "lucide-react";
+import { UserRoundPlus, UserRoundX } from "lucide-react";
 import { notFound } from "next/navigation";
 
 
@@ -39,7 +42,11 @@ export default async function Employees(props: Props) {
 
             <TableBody>
                 {data.map((e: any) => <TableRow key={'ROW_'+e.id}>
-                    <TableCell>{e.first_name+' '+e.last_name}</TableCell>
+                    <TableCell className="flex items-center justify-between">
+                        <span>{e.first_name+' '+e.last_name}</span>
+
+                        <RemoveUser businessId={params.id} name={e.first_name+' '+e.last_name} userId={e.id}/>
+                    </TableCell>
                 </TableRow>)}
             </TableBody>
         </Table>
