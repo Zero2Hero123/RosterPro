@@ -4,13 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { logIn, signUp } from "@/utils/actions";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const initState = {
     message: ''
 }
 
 const Auth: React.FC<{}> = () => {
+
+    const search = useSearchParams()
+
+    const authMethod = search.get('m')
 
     const [state,signUpAction] = useActionState(signUp,initState)
 
@@ -33,7 +37,7 @@ const Auth: React.FC<{}> = () => {
                 <div className="">
                     <div className=" text-red-500 text-center h-4">{state.message as string}</div>
                     <div className=" text-red-500 text-center h-4">{logInState.message as string}</div>
-                    <Tabs defaultValue="sign-up">
+                    <Tabs defaultValue={authMethod || 'sign-up'}>
                         <TabsList className="bg-black flex justify-center my-2" >
                             <TabsTrigger value={"sign-up"}>Sign Up</TabsTrigger>
                             <TabsTrigger value={"log-in"}>Log In</TabsTrigger>
@@ -46,7 +50,7 @@ const Auth: React.FC<{}> = () => {
                                 <div className="px-4 flex flex-col gap-2 items-center">
                                     <div className="flex flex-col gap-2 basis-[80%]">
                                         <Input required name="email" type="email" className="bg-black" placeholder="Email"/>
-                                        <Input name="business_name" type="text" className="bg-black" placeholder="Business Name (Optional)"/>
+                                        <Input name="business_name" type="text" className="bg-black" placeholder="Organization Name (Optional)"/>
                                         <div className="flex gap-2">
                                             <Input required name="fname" className="bg-black" placeholder="First Name"/>
                                             <Input required name='lname' className="bg-black" placeholder="Last Name"/>

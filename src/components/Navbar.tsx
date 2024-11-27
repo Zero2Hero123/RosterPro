@@ -67,7 +67,7 @@ const Navbar: React.FC = async () => {
                 </NavigationMenu>
             </div>
 
-            {myProfile && <div className="flex items-center">
+            {myProfile ? <div className="flex items-center">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button className="flex justify-around items-center border border-gray-500 bg-black hover:bg-slate-950 gap-2"> <span className="grow text-center hidden md:inline"> Dashboard </span> <Building2 />  </Button>
@@ -99,7 +99,11 @@ const Navbar: React.FC = async () => {
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-                </div>}
+                </div> : <div className="flex items-center mr-6">
+                            <Link className="hover:text-2xl transition-all" href={'/auth?m=log-in'}>Log In</Link>
+                            <span className="text-3xl text-[#3b3b3b]">/</span>
+                            <Link className="hover:text-2xl transition-all" href={'auth?m=sign-up'}>Sign Up</Link>
+                    </div>}
             
         </nav>
     )

@@ -88,16 +88,15 @@ export default function Chat(props: Props) {
     },[messages])
 
 
-    // TODO add sendMessage server action
     return <>
     
         
-        <section className="bg-gradient-to-b from-slate-950 to-slate-800  w-[100%] flex flex-col grow">
+        <section className="bg-gradient-to-b from-[#121212] to-[#454545] w-[100%] flex flex-col justify-between h-[90vh]">
             <header className="flex justify-center">
                 {business ? <span className="text-3xl font-bold ">{business.name}</span> : <Skeleton className="h-[36px] w-[300px]" />}
             </header>
 
-            <div className="flex flex-col gap-2 justify-end grow p-2">
+            <div className="gap-2 justify-end p-2 overflow-y-scroll">
                 {
                     messages.map((m,i) => 
                         <Message withPersonLabel={(i > 0 ? messages[i-1].author_id != m.author_id : true)} key={'MSG_'+m.authorId+m.id} businessId={m.business_id} authorId={m.author_id} content={m.content} createdAt={m.createdAt} />

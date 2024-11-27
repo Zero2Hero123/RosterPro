@@ -43,7 +43,7 @@ const Message = ({content,authorId, withPersonLabel = true}: Props) => {
             .then(res => setUser(res.data.user))
     },[])
 
-    return <div className={`flex ${authorId == user?.id ? 'justify-end' : 'justify-start'}`}>
+    return <div className={`flex my-1 ${authorId == user?.id ? 'justify-end' : 'justify-start'}`}>
 
         <div className={`flex ${authorId == user?.id ? 'bg-black' : 'bg-gray-700'} text-white p-3 rounded-lg text-sm`}>
             {(withPersonLabel && author) && <ProfilePic firstName={author.first_name} lastName={author.last_name} size={10}/>}
