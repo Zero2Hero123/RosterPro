@@ -27,7 +27,7 @@ const Auth: React.FC<{}> = () => {
     }
 
     return (<>
-        <Suspense fallback={'loading'}>
+        
         
         <main className=" flex justify-center items-center h-[88vh]">
             <div className="bg-black w-[35%] min-w-[360px] rounded-lg aspect-square">
@@ -84,7 +84,6 @@ const Auth: React.FC<{}> = () => {
                 </div>
             </div>
         </main>
-        </Suspense>
     
     
     </>)

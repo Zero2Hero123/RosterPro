@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/toaster";
+import { Suspense } from "react";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -21,9 +22,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className + " bg-[#121212] text-white"}>
-          <Navbar/>
-          {children}
-          <Toaster/>
+          <Suspense fallback='Loading'>
+            <Navbar/>
+            {children}
+            <Toaster/>
+          </Suspense>
       </body>
     </html>
   );
