@@ -1,6 +1,6 @@
 'use server'
 
-import { format } from 'date-fns'
+import { addDays, format, formatDate } from 'date-fns'
 import OpenAI from 'openai'
 import { DateRange } from 'react-day-picker'
 import {ZodError, z} from 'zod'
@@ -58,7 +58,9 @@ function createPrompt(args: GenerateProps){
 }
 
 const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
-function createShiftPrompt(names: string[],availabilities: any[]){
+async function createShiftPrompt(names: string[],availabilities: any[],timeOffRequests: any[]){
+    const supabase = await createClient()
+    
 
     const mappedAvails: Record<string,any> = names.map((n,i) => availabilities[i])
 
@@ -71,7 +73,7 @@ function createShiftPrompt(names: string[],availabilities: any[]){
     let avails: string[] = [] // store each person's availability in a sentence
 
     for(let name of names){
-        let str = `${name} is available on `
+        let str = `${name} is ONLY available on `
 
         for(let d of days.filter(d => trueMap.get(name)[d].enabled)){
             const currDay = trueMap.get(name)[d]
@@ -81,7 +83,26 @@ function createShiftPrompt(names: string[],availabilities: any[]){
         avails.push(str)
     }
 
-    return `Generate a schedule with the following names, ${names.join(', ')}. Factor in the following availabilities of each person, ${avails.join('')}. Return the result in a JSON format, with which name mapped to a list of the shifts. Each index of the lists will represent sunday-saturday (0-7) and each index is an object of type {from: number, to: number}, where "from" is the time their shift starts and "to" is the time their shift ends. Every person's list always has a length of 7 because there are 7 days in a week. YOU ONLY OUTPUT JSON. No extraneous text!`
+    let timeOff: string[] = []
+
+    console.log('TIME OFF',timeOffRequests)
+
+    for(let t of timeOffRequests){
+        const profileData = await supabase.from('profiles').select().eq('id',t.user_id)
+        if(profileData.error) {console.error(profileData.error.message); continue}
+        
+        const profile = profileData.data[0]
+
+        const name  = profile.first_name + ' ' + profile.last_name
+
+        let timeOffStr = `${name} has time off from ${formatDate(t.from,'MMMM dd, yyyy')} to ${formatDate(t.to,'MMMM dd, yyyy')}`
+        
+        timeOff.push(timeOffStr)
+    }
+
+    const thisSunday = await getThisSunday()
+
+    return ` Generate a schedule with the following names, ${names.join(', ')}. For context, this week's sunday is ${formatDate(thisSunday,'MMMM dd,yyyy')} Know that people can be scheduled on the same day. Factor in the following availabilities of each person: ${avails.join('')}. Secondly, if a person who has time off on any given day, do not schedule them for that day. Factor in the following approved time-off requests: ${timeOff.join(', ')}.  Return the result ONLY in raw JSON format, in which each person's name is mapped to a list of the shifts they will work. Each index of said lists will represent sunday-saturday, 0-7 respectively, and the value at each index is an object of type, {from: number, to: number}, where "from" is the time their shift starts and "to" is the time their shift ends in Military 24hr time. Every person's list always has a length of 7 because there are 7 days in a week. YOU ONLY OUTPUT raw json. Absolutely NO comments and NO extraneous text!`
 }
 
 const openai = new OpenAI({
@@ -94,15 +115,17 @@ export default async function generate(args: GenerateProps): Promise<GenerateRes
 
     const res = await openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
+        response_format: {type: 'json_object'},
         messages: [
             {role: 'system', content: systemRole},
             {role: 'user', content: prompt}
         ]
     })
 
-    const schedule = JSON.parse(res.choices[0].message.content as string)
+    console.log(typeof res.choices[0].message.content)
 
-    console.log(schedule)
+    const schedule: GenerateResponse = JSON.parse(res.choices[0].message.content!) as any
+
 
     return schedule as GenerateResponse
 }
@@ -342,7 +365,7 @@ export async function generateShifts(prev: any,formData: FormData): Promise<Shif
     console.log(businessId)
 
 
-
+    // Factor in the availability of each person
     const availabilities = await supabase.from('availability')
         .select()
         .eq('business_id',businessId).order('user_id') // get the corresponding availabilities in order of their user_ids (user's id)
@@ -350,7 +373,6 @@ export async function generateShifts(prev: any,formData: FormData): Promise<Shif
     if(availabilities.count == 0){
         return {generated: false, schedule: null}
     }
-
     const names = await supabase.from('profiles').select('first_name,last_name')
     .in('id',availabilities.data?.map(o => o.user_id) as any[]).order('id') // get the corresponding names in order of their ids (user's id)
 
@@ -358,24 +380,29 @@ export async function generateShifts(prev: any,formData: FormData): Promise<Shif
     const namesInOrder = names.data?.filter(n => enteredNames.some(n2 => `${n.first_name} ${n.last_name}` == n2)) // filter to only names that were selected
 
 
-    // console.log(namesInOrder)
+    // Factor in approved Time-off requests of each person
+    const timeOffData = await supabase.from('time_off_request').select()
+        .eq('business_id',businessId).eq('approved','APPROVED')
 
-    
+    const timeOffRequests = timeOffData.data
 
     // const names = (formData.get('names') as string).split(',')
 
-    const prompt = createShiftPrompt(namesInOrder.map(n => `${n.first_name} ${n.last_name}`),availabilities.data as any[])
+    const prompt = await createShiftPrompt(namesInOrder.map(n => `${n.first_name} ${n.last_name}`),availabilities.data as any[],timeOffRequests!)
     console.log('PROMPT: ',prompt)
 
-    const shiftSystemRole = "You are the intelligent robot manager of a organization,  you are in charge of designing schedules for your organization to schedule for your workers to know when and how long they work. Assume times are in military time. You ONLY schedule people on days they are available unless told otherwise. Any days a person isn't available is set to {from: 0,to: 0} You always output JSON and ONLY JSON output. No extraneous text."
+    const shiftSystemRole = "You are the intelligent robot manager of a organization,  you are in charge of designing schedules for your organization to schedule for your workers to know when and how long they work. Assume times are in 24hr military time. You ONLY schedule people on days they are available unless told otherwise. Any days a person isn't available is set to {from: 0,to: 0} You always output JSON and ONLY JSON output. No extraneous text."
 
     const res = await openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
+        response_format: {type: 'json_object'}, // ! breaks generation for some reason
         messages: [
             {role: 'system', content: shiftSystemRole},
             {role: 'user', content: prompt}
         ]
     })
+
+    console.log(res.choices[0].message)
 
     const timeSheet = JSON.parse(res.choices[0].message.content as string)
 
@@ -386,3 +413,17 @@ export async function generateShifts(prev: any,formData: FormData): Promise<Shif
         generated: true
     }
 }
+
+async function getThisSunday(){
+    const today = new Date()
+
+    let sunday = today
+
+    while(sunday.getDay() != 0){
+        addDays(sunday,-1)
+    }
+
+    return sunday;
+}
+
+// AIzaSyDVPUyMRirjbHJxoPhHmYvkDWIk8SnxNfU

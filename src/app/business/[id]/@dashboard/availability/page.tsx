@@ -73,12 +73,19 @@ export default function Availability(props: Props) {
     })
 
     const [user,setUser] = useState<User | null>(null)
+
+    useEffect(() => {
+        supabase.auth.getUser()
+            .then(res => setUser(res.data.user))
+    },[])
+
     useEffect(() => {
 
-        supabase.from('availability').select().eq('business_id',params.id)
+        if(user){
+            supabase.from('availability').select().eq('business_id',params.id).eq('user_id',user.id)
             .then(({data,error}) => {
                 if(error) {
-                    console.error(error)
+                    console.error(error.message)
                 } else if(data.length) {
 
 
@@ -90,16 +97,22 @@ export default function Availability(props: Props) {
 
                 // console.log(data)
             })
+        }
 
-        supabase.auth.getUser()
-            .then(res => setUser(res.data.user))
+    },[user])
 
-    },[])
+    useEffect(() => {
+        console.log(availability)
+    },[availability])
 
     const saveAvailability = useCallback(function (day: string){
         console.log(availability[(day as keyof Availability)])
         supabase.from('availability').update({
-            [day]: {...availability[(day as keyof Availability)]},
+            [day]: {
+                from: availability[(day as keyof Availability)].from,
+                to: availability[(day as keyof Availability)].to,
+                enabled: availability[(day as keyof Availability)].enabled
+            },
         }).eq('user_id',user?.id).eq('business_id',params.id).then(res => {
             if(res.error) {
                 console.error(res.error)

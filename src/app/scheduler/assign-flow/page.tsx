@@ -221,20 +221,28 @@ export default function Scheduler(){
 
     const [generatedSchedule,setSchedule] = useState<GenerateResponse[] | null>(null)
     const [isGenerating,startTransition] = useTransition()
+    const [pages,setPages] = useState<GenerateResponse[][]>([])
 
     const gen = useCallback(async () => {
         let data = {names: names, jobs: jobs, dateRange: selectedRange as DateRange,days: chosenDays.map(d => d+'s'),advancedEnabled: advancedEnabled,jobPercentages: percentages}
         
         startTransition(async () => {
             const res = await fetch('/api/generate',{method: 'POST', body: JSON.stringify(data)})
-            setSchedule(await res.json())
+
+            const schedule = await res.json()
+            console.log(schedule)
+
+            setSchedule(schedule)
         })
     },[names,jobs,selectedDays,selectedRange])
 
-    const paginatedSchedule = useMemo(() => {
+    useEffect(() => {
+
         let paginated: GenerateResponse[][] = []
 
-        if(generatedSchedule){
+        
+
+        if(generatedSchedule?.length){
             let onePage = []
             let i = 0;
             while(i < generatedSchedule.length){
@@ -247,15 +255,19 @@ export default function Scheduler(){
             }
         }
 
+        console.log('post generation',generatedSchedule)
         console.log('PAGES', paginated)
 
-        return paginated
+        setPages(paginated)
 
+
+
+        console.log('SCHEDULE',generatedSchedule)
     },[generatedSchedule])
 
     useEffect(() => {
-        console.log('SCHEDULE',generatedSchedule)
-    },[generatedSchedule])
+        console.log(pages)
+    },[pages])
 
     // Quick validation
     function quickCheck(){
@@ -495,7 +507,7 @@ export default function Scheduler(){
 
             <section className="flex justify-center flex-wrap mb-10 gap-3">
                 {
-                    paginatedSchedule.map((v,i) => <Document key={'DAY'+i} names={names} days={v}/>)
+                    pages.map((v,i) => <Document key={'DAY'+i} names={names} days={v}/>)
                 }
             </section>
         </main>

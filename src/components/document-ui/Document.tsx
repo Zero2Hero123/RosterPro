@@ -13,7 +13,7 @@ const Document: React.FC<Props> = ({days,names}) => {
         
         <div className="grid grid-rows-5 grid-cols-2">
             {
-                days.map((d) => <Row key={d.day} day={d} names={names}/>)
+                days.map((d,i) => <Row key={d+`${Math.random()}`} day={d} names={names}/>)
             }
         </div>
 
