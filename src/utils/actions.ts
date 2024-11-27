@@ -102,7 +102,7 @@ async function createShiftPrompt(names: string[],availabilities: any[],timeOffRe
 
     const thisSunday = await getThisSunday()
 
-    return ` Generate a schedule with the following names, ${names.join(', ')}. For context, this week's sunday is ${formatDate(thisSunday,'MMMM dd,yyyy')} Know that people can be scheduled on the same day. Factor in the following availabilities of each person: ${avails.join('')}. Secondly, if a person who has time off on any given day, do not schedule them for that day. Factor in the following approved time-off requests: ${timeOff.join(', ')}.  Return the result ONLY in raw JSON format, in which each person's name is mapped to a list of the shifts they will work. Each index of said lists will represent sunday-saturday, 0-7 respectively, and the value at each index is an object of type, {from: number, to: number}, where "from" is the time their shift starts and "to" is the time their shift ends in Military 24hr time. Every person's list always has a length of 7 because there are 7 days in a week. YOU ONLY OUTPUT raw json. Absolutely NO comments and NO extraneous text!`
+    return ` Generate a schedule with the following names, ${names.join(', ')}. For context, this week's sunday is ${formatDate(thisSunday,'MMMM dd,yyyy')}. Factor in the following availabilities of each person: ${avails.join('')}. Secondly, if a person who has time off on any given day, do not schedule them for that day. Factor in the following approved time-off requests: ${timeOff.join(', ')}.  Return the result ONLY in raw JSON format, in which each person's name is mapped to a list of the shifts they will work. Each index of said lists will represent sunday-saturday, 0-7 respectively, and the value at each index is an object of type, {from: number, to: number}, where "from" is the time their shift starts and "to" is the time their shift ends in Military 24hr time. Every person's list always has a length of 7 because there are 7 days in a week. YOU ONLY OUTPUT raw json. Absolutely NO comments and NO extraneous text!`
 }
 
 const openai = new OpenAI({
@@ -391,18 +391,16 @@ export async function generateShifts(prev: any,formData: FormData): Promise<Shif
     const prompt = await createShiftPrompt(namesInOrder.map(n => `${n.first_name} ${n.last_name}`),availabilities.data as any[],timeOffRequests!)
     console.log('PROMPT: ',prompt)
 
-    const shiftSystemRole = "You are the intelligent robot manager of a organization,  you are in charge of designing schedules for your organization to schedule for your workers to know when and how long they work. Assume times are in 24hr military time. You ONLY schedule people on days they are available unless told otherwise. Any days a person isn't available is set to {from: 0,to: 0} You always output JSON and ONLY JSON output. No extraneous text."
+    const shiftSystemRole = "You are the intelligent robot manager of a organization,  you are in charge of designing schedules for your organization to schedule for your workers to know when and how long they work. Assume times are in 24hr military time. You ONLY schedule people on days they are available unless told otherwise. Any days a person isn't available is set to {from: 0,to: 0} You always output JSON and ONLY JSON output. No extraneous text. Evaluatd the schedule modify accordingly based on what I specified before you push it out"
 
     const res = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        response_format: {type: 'json_object'}, // ! breaks generation for some reason
+        model: 'gpt-4o-mini',
+        response_format: {type: 'json_object'},
         messages: [
             {role: 'system', content: shiftSystemRole},
             {role: 'user', content: prompt}
         ]
     })
-
-    console.log(res.choices[0].message)
 
     const timeSheet = JSON.parse(res.choices[0].message.content as string)
 
@@ -413,14 +411,14 @@ export async function generateShifts(prev: any,formData: FormData): Promise<Shif
         generated: true
     }
 }
-
-async function getThisSunday(){
+export async function getThisSunday(){
     const today = new Date()
 
     let sunday = today
 
     while(sunday.getDay() != 0){
-        addDays(sunday,-1)
+        console.log(sunday.getDay())
+        sunday = addDays(sunday,-1)
     }
 
     return sunday;

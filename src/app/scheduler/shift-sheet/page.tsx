@@ -7,13 +7,13 @@ import TimeSheetRow from "@/components/shift-table-ui/TimeSheetRow";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { generateShifts } from "@/utils/actions";
+import { generateShifts, getThisSunday } from "@/utils/actions";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { add, formatDate, sub } from "date-fns"
-import { ChevronsUpDown } from "lucide-react";
+import { add, addDays, formatDate, sub } from "date-fns"
+import { ChevronLeft, ChevronRight, ChevronsUpDown, SquareSlash } from "lucide-react";
 import { Span } from "next/dist/trace";
-import { useActionState, useEffect, useRef, useState } from "react";
+import { MouseEvent, useActionState, useEffect, useRef, useState } from "react";
 
 import { createSwapy } from 'swapy'
 
@@ -43,16 +43,57 @@ export default function WeeklyScheduler(){
     const [organizationMembers,setMembers]= useState<any[]>([])
     const [trueMembers,setTrueMembers] = useState<Set<any>>(new Set()) // organization members who should be included in the timesheet
 
+    const rosterChatInput = useRef<HTMLInputElement>(null)
 
     const [data,generateShiftAction,isPending] = useActionState(generateShifts,{generated: false, schedule: null})
     const arr = new Array(40)
     arr.fill(1)
+
+    const [week,setWeek] = useState<Date[]>([])
 
     useEffect(() => {
 
         supabase.auth.getUser()
             .then(res => setUser(res.data.user))
 
+    },[])
+
+    useEffect(() => {
+        const days: Date[] = []
+
+        getThisSunday()
+            .then((sunday) => {
+                let day = sunday
+                for(let i = 0; i < 7; i++){
+                    days.push(day)
+
+                    day = addDays(day,1)
+                }
+
+                setWeek(days)
+            })
+
+        console.info(days)
+
+        
+    },[])
+
+    function initChat(e: KeyboardEvent){
+        if(e.key == '/'){
+            rosterChatInput.current!.value = ''
+            rosterChatInput.current?.focus()
+        }
+    }
+    useEffect(() => {
+
+
+        if(rosterChatInput.current){
+            window.addEventListener('keypress',initChat)
+        }
+
+        return () => {
+            window.removeEventListener('keypress',initChat)
+        }
     },[])
 
     useEffect(() => {
@@ -82,11 +123,29 @@ export default function WeeklyScheduler(){
     },[selectedBusinessId])
 
 
-    useEffect(() => {
-        console.log(trueMembers)
-    },[trueMembers])
+    function shiftRight(event: MouseEvent<HTMLButtonElement>) {
+        
+        setWeek((prev) => {
 
+            let newWeek = [...prev]
 
+            newWeek = newWeek.map(d => addDays(d,1))
+
+            return newWeek
+        })
+
+    }
+
+    function shiftLeft(event: MouseEvent<HTMLButtonElement>): void {
+        setWeek((prev) => {
+
+            let newWeek = [...prev]
+
+            newWeek = newWeek.map(d => addDays(d,-1))
+
+            return newWeek
+        })
+    }
 
     return <>
     
@@ -124,23 +183,31 @@ export default function WeeklyScheduler(){
                 <Input readOnly name={`names`} value={[...trueMembers].join(',')} className="hidden" />
                 <Input readOnly name={`businessId`} value={selectedBusinessId ?? ''} className="hidden" />
             </form>
+{/* 
+            <form className="flex flex-col gap-2 p-4">
+
+                <Input ref={rosterChatInput} type="text" className="bg-slate-900 border-none hover:border-none" placeholder="Press / to start speaking to Roster"/>
+                
+            </form> */}
 
         </div>
 
 
         {/* Document Component */}
-        <div className="bg-white p-4 text-black w-[65%] max-w-[800px] print:w-[850px] print:h-[952px] aspect-[17/22] flex justify-center mr-10">
+        <div className="bg-white p-4 relative text-black w-[65%] max-w-[800px] print:w-[850px] print:h-[952px] aspect-[17/22] flex justify-center mr-10">
 
+            <Button onClick={shiftLeft} className="absolute left-10 bg-white hover:bg-slate-200" size={'icon'}> <ChevronLeft color="black"/> </Button>
+            <Button onClick={shiftRight} className="absolute right-10 bg-white hover:bg-slate-200" size={'icon'}> <ChevronRight color="black"/> </Button>
+            
+            
             <div ref={container} className={`grid grid-rows-40 grid-cols-8`}>
 
                 {/* Days of the Week */}
-                <span className="text-sm font-medium text-center col-start-2"> Sunday <br/> {formatDate(new Date(),"M/dd")}</span>
-                <span className="text-sm font-medium text-center"> Monday <br/> {formatDate(new Date(),"M/dd")}</span>
-                <span className="text-sm font-medium text-center"> Tuesday <br/> {formatDate(new Date(),"M/dd")}</span>
-                <span className="text-sm font-medium text-center"> Wednesday <br/> {formatDate(new Date(),"M/dd")}</span>
-                <span className="text-sm font-medium text-center"> Thursday <br/> {formatDate(new Date(),"M/dd")}</span>
-                <span className="text-sm font-medium text-center"> Friday <br/> {formatDate(new Date(),"M/dd")}</span>
-                <span className="text-sm font-medium text-center"> Saturday <br/> {formatDate(new Date(),"M/dd")}</span>
+                {
+                    week.map((d,i) => <span key={`WEEK_DAY_${d}`} className={`text-sm font-medium text-center ${i == 0 && 'col-start-2'}`}> {formatDate(d,'iiii')} <br/> {formatDate(d,'MM/dd')}</span>)
+                }
+
+
                 
                 {
                     data.generated ? [...trueMembers].map((v,i) => {arr.pop(); return <TimeSheetRow key={`ROW_${i}`} asPlaceHolder={false} personName={v} avail={data.generated ? data.schedule[v] : []}/>}) : arr.map((v,i) => <TimeSheetRow asPlaceHolder={true} key={'row' + i} personName={""} avail={[]} />)
