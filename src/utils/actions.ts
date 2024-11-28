@@ -252,7 +252,7 @@ export async function deletePreset(id: string){
     revalidatePath('/dashboard/scheduler')
 }
 
-export async function sendEmail(data: FormData){
+export async function sendEmail(prev: any,data: FormData){
 
     const client = await createClient()
     const user = await client.auth.getUser()
@@ -274,6 +274,8 @@ export async function sendEmail(data: FormData){
         subject: 'Invite Recieved',
         react: EmailInvite({name: myProfile.first_name+' '+myProfile.last_name,businessName: data.get('bizName') as string,id: data.get('bizId') as string})
     })
+
+    return res
 
 }
 

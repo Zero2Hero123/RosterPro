@@ -9,7 +9,7 @@ import { Resend } from 'resend'
 import { createClient } from "@/utils/supabase/server";
 import { usePathname, useRouter } from "next/navigation";
 import { sendEmail } from "@/utils/actions";
-import { useRef } from "react";
+import { useActionState, useRef } from "react";
 import { useToast } from "../ui/use-toast";
 
 interface Props {
@@ -23,6 +23,8 @@ export default function Invite({businessName,businessId}: Props){
     const emailInput = useRef<HTMLInputElement>(null)
 
     const { toast } = useToast()
+
+    const [state,sendEmailAction,isPening] = useActionState(sendEmail,{error: null,data: null})
     
     function notify(){
         console.log('NOTIFY')
@@ -47,7 +49,7 @@ export default function Invite({businessName,businessId}: Props){
                 <DialogHeader>
                     <DialogTitle className="flex items-center justify-center"> <UserRoundPlus size={15} />  Send Invite</DialogTitle>
                 </DialogHeader>
-                <form action={sendEmail} method="POST" className="flex gap-3">
+                <form action={sendEmailAction} method="POST" className="flex gap-3">
                     <input className="hidden" name="bizName" value={businessName} />
                     <input className="hidden" name="bizId" value={businessId} />
 
