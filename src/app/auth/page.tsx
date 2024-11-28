@@ -1,13 +1,24 @@
 'use client'
-import { Suspense, useActionState } from "react";
+import { Suspense, useActionState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { logIn, signUp } from "@/utils/actions";
-import { useRouter, useSearchParams } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 
-const initState = {
-    message: ''
+interface Success {
+    error: null,
+    businessId: string
+}
+
+interface RosterError {
+    error: string,
+    businessId: null
+}
+
+const initState: RosterError | Success = {
+    error: '',
+    businessId: null
 }
 
 const Auth: React.FC<{}> = () => {
@@ -22,9 +33,13 @@ const Auth: React.FC<{}> = () => {
 
     const router = useRouter()
 
-    if(state.message == 'Success!'){
-        router.back()
-    }
+    useEffect(() =>{
+        if(state.businessId){
+            router.back()
+        } else if(state.error){
+            console.error(state.error)
+        }
+    },[state])
 
     return (<>
         
@@ -35,8 +50,8 @@ const Auth: React.FC<{}> = () => {
                     <span>Join RosterPro</span>
                 </div>
                 <div className="">
-                    <div className=" text-red-500 text-center h-4">{state.message as string}</div>
-                    <div className=" text-red-500 text-center h-4">{logInState.message as string}</div>
+                    <div className=" text-red-500 text-center h-4">{state.error as string}</div>
+                    <div className=" text-red-500 text-center h-4">{logInState.error as string}</div>
                     <Tabs defaultValue={authMethod || 'sign-up'}>
                         <TabsList className="bg-black flex justify-center my-2" >
                             <TabsTrigger value={"sign-up"}>Sign Up</TabsTrigger>

@@ -168,23 +168,21 @@ export async function signUp(prevState: any, data: FormData){
             email: newUser.email
         })
 
-        await client.from('business').insert({
-            name: (data.get('business_name') as string),
+        const newBusinesses = await client.from('business').insert({
+            name: (data.get('business_name') as string) || `${newUser.firstName}'s Business`,
             owner_id: res.data.user?.id
         })
-
-        if(res.data) {
-            return {message: 'Success!'}
-        }
             
         
     } catch(e){
+        console.error(e)
         return {
-            message: e
+            businessId: null,
+            error: e
         }
     }
 
-    return {message: ''}
+    return {businessId: 'works',error: null}
 }
 
 export async function logIn(prevState: any, data: FormData){
@@ -202,7 +200,8 @@ export async function logIn(prevState: any, data: FormData){
 
     if(res.error){
         return {
-            message: res.error.message
+            error: res.error.message,
+            businessId: null
         }
     }
 
@@ -210,7 +209,7 @@ export async function logIn(prevState: any, data: FormData){
 
     console.log('LOG IN',res)
 
-    return {message: ''}
+    return {error: null,businessId: null}
 }
 
 export async function signOut(){

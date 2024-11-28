@@ -2,7 +2,6 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
-
 export async function GET(req: NextRequest) {
 
     const businessId = req.nextUrl.searchParams.get('id')
@@ -11,12 +10,13 @@ export async function GET(req: NextRequest) {
     const user = await supabase.auth.getUser()
 
 
+
     // check for user authenticated
-    if(!user){
-        redirect('/auth')
+    if(!user.data.user){
+        redirect(`${req.nextUrl.host}/auth`)
     }
 
-    const id = user.data.user?.id
+    const {id} = user.data.user
     
     let myProfile: any; 
     const profiles = await supabase.from('profiles').select().eq('id',id)
@@ -31,9 +31,9 @@ export async function GET(req: NextRequest) {
     })
 
     if(error){
-        redirect(`/business/${businessId}`)
+        redirect(`${req.nextUrl.host}/business/${businessId}`)
     }
 
 
-    redirect(`/business/${businessId}`)
+    redirect(`${req.nextUrl.host}//business/${businessId}`)
 }
