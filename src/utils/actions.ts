@@ -8,7 +8,7 @@ import { createClient } from './supabase/server'
 import { redirect, RedirectType } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
-import { Resend } from 'resend'
+import { CreateEmailRequestOptions, CreateEmailResponse, Resend } from 'resend'
 import EmailInvite from '@/components/dashboard-ui/EmailInvite'
 
 const resend = new Resend(process.env.RESEND_KEY)
@@ -252,7 +252,7 @@ export async function deletePreset(id: string){
     revalidatePath('/dashboard/scheduler')
 }
 
-export async function sendEmail(prev: any,data: FormData){
+export async function sendEmail(prev: CreateEmailResponse,data: FormData){
 
     const client = await createClient()
     const user = await client.auth.getUser()
@@ -266,14 +266,24 @@ export async function sendEmail(prev: any,data: FormData){
         myProfile = profiles.data![0]
     }
 
+    const {first_name,last_name} = myProfile
+
     const email = data.get('email') as string
+    const prefix = `${(first_name as string).substring(0,1)}${(last_name as string)}`
 
     const res = await resend.emails.send({
-        from: 'roster@rosterprofessional.com',
+        from: `${prefix.toLowerCase()}@rosterprofessional.com`,
         to: [email],
         subject: 'Invite Recieved',
         react: EmailInvite({name: myProfile.first_name+' '+myProfile.last_name,businessName: data.get('bizName') as string,id: data.get('bizId') as string})
     })
+
+    if(res.error) {
+        console.error(res.error.message)
+    
+    } else {
+        console.info(res.data)
+    }
 
     return res
 
