@@ -8,7 +8,5 @@ export async function POST(req: NextRequest){
 
     const { schedule } = await generate(props) as any
 
-    console.log(schedule)
-
     return NextResponse.json(schedule)
 }

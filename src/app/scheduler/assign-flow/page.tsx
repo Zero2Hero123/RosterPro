@@ -136,7 +136,7 @@ export default function Scheduler(){
     // DATES
     const [selectedRange,setDate] = useState<DateRange | undefined>({
         from: new Date(),
-        to: addDays(new Date(),30)
+        to: addDays(new Date(),7)
     })
 
     const [selectedDays,setDays] = useState<DaysMap>({
@@ -328,7 +328,7 @@ export default function Scheduler(){
 
                     setNames(preset.names)
                     setJobs(preset.jobs)
-                    setDate(preset.date_range)
+                    // setDate(preset.date_range)
                     dispatch({type: 'overwrite', percentages: preset.job_percentages})
 
                     toast({
