@@ -105,7 +105,7 @@ export default function Availability(props: Props) {
         console.log(availability)
     },[availability])
 
-    const saveAvailability = useCallback(function (day: string){
+    const saveAvailability = (day: string) => {
         console.log(availability[(day as keyof Availability)])
         supabase.from('availability').update({
             [day]: {
@@ -127,7 +127,7 @@ export default function Availability(props: Props) {
             
         })
         
-    },[user])
+    }
 
     function sendUpdate(data: AvailabilityAction){
         setAvailability(data)

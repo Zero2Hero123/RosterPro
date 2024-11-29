@@ -96,12 +96,23 @@ async function createShiftPrompt(startingDate: Date,names: string[],availabiliti
 
         const name  = profile.first_name + ' ' + profile.last_name
 
-        let timeOffStr = `${name} has time off from ${formatDate(t.from,'MMMM dd, yyyy')} to ${formatDate(t.to,'MMMM dd, yyyy')}`
+        let timeOffStr = `${name} has time off from ${formatDate(t.from,'MMMM dd, yyyy')} to ${formatDate(t.to,'MMMM dd, yyyy')} ( in 24hr military time)`
         
         timeOff.push(timeOffStr)
     }
 
-    return ` Generate a schedule with the following names, ${names.join(', ')}. For context, this week's schedule starts with a ${formatDate(startingDate,'iiii')} and ends with ${formatDate(endingDate,'iiii')}, specifically ${formatDate(startingDate,'MMMM dd,yyyy')} to ${formatDate(endingDate,'MMMM dd,yyyy')}, respectively. Factor in the following availabilities of each person: ${avails.join('')}. Secondly, if a person who has time off on any given day, do not schedule them for that day. Factor in the following approved time-off requests: ${timeOff.join(', ')}.  Return the result ONLY in raw JSON format, in which each person's name is mapped to a list of the shifts they will work. Each index of said lists will represent the days of week a person is working, ${formatDate(startingDate,'iii')}-${formatDate(endingDate,'iii')}, 0-7 respectively, and the value at each index is an object of type, {leave: null, from: number, to: number}, where "from" is the time their shift starts and "to" is the time their shift ends in Military 24hr time. "leave" just means they're on time-off for that day, in which case, set schedule[name][i] to {leave: true, from: null, to: null}, if it is not due to time-off, set to {leave: false, from: 0, to: 0} Every person's list always has a length of 7 because there are 7 days in a week. YOU ONLY OUTPUT raw json. Absolutely NO comments and NO extraneous text!`
+    const daysInOrder: string[] = []
+    let d: Date = startingDate;
+    let i = 0
+
+    while(i < 7){
+        daysInOrder.push(formatDate(d,'iiii'))
+
+        d = addDays(d,1)
+        i++
+    }
+
+    return ` Generate a schedule with the following names, ${names.join(', ')}. For context, this week's schedule starts with a ${formatDate(startingDate,'iiii')} and ends with ${formatDate(endingDate,'iiii')}, specifically ${formatDate(startingDate,'MMMM dd,yyyy')} to ${formatDate(endingDate,'MMMM dd,yyyy')}, respectively. The times of people's shifts is represented in military time. Factor in the following availabilities of each person: ${avails.join('')}. Secondly, if a person who has time off on any given day, do not schedule them for that day. Factor in the following approved time-off requests: ${timeOff.length > 0 ? timeOff.join(', ') : 'None'}.  Return the result ONLY in raw JSON format, in which each person's name is mapped to a list of the shifts they will work, since it is . Each index of said lists will represent the days of week a person is working, [${daysInOrder.join(',')}], 0-7 respectively, and the value at each index is an object of type, {leave: null, from: number, to: number}, where "from" is the time their shift starts and "to" is the time their shift ends, all in 24HR time. The "leave" value just means they have an approved time-off for that day, in which case, set schedule[name][i] to {leave: true, from: null, to: null} only if that date falls into an approved time-off request I specified for that person. If it is not due to time-off, set to {leave: false, from: 0, to: 0} Every person's list always has a length of 7 because there are 7 days in a week. YOU ONLY OUTPUT raw json. Absolutely NO comments and NO extraneous text!`
 }
 
 const openai = new OpenAI({
@@ -403,10 +414,10 @@ export async function generateShifts(prev: any,formData: FormData): Promise<Shif
     const prompt = await createShiftPrompt(startingDay,namesInOrder.map(n => `${n.first_name} ${n.last_name}`),availabilities.data as any[],timeOffRequests!)
     console.log('PROMPT: ',prompt)
 
-    const shiftSystemRole = "You are the intelligent robot manager of a organization,  you are in charge of designing schedules for your organization to schedule for your workers to know when and how long they work. Assume times are in 24hr military time. You ONLY schedule people on days they are available unless told otherwise. Any days a person isn't available is set to {from: 0,to: 0} You always output JSON and ONLY JSON output. No extraneous text. Evaluatd the schedule modify accordingly based on what I specified before you push it out"
+    const shiftSystemRole = "You are the intelligent robot manager of a organization,  you are in charge of designing schedules for your organization to schedule for your workers to know when and how long they work. Assume times are in 24hr military time. You ONLY schedule people on days they are available unless told otherwise. You always output JSON and ONLY JSON output. No extraneous text!"
 
     const res = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
+        model: 'chatgpt-4o-latest',
         response_format: {type: 'json_object'},
         messages: [
             {role: 'system', content: shiftSystemRole},

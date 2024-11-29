@@ -203,8 +203,8 @@ export default function WeeklyScheduler(){
         {/* Document Component */}
         <div className="bg-white p-4 relative text-black w-[65%] max-w-[800px] print:w-[850px] print:h-[952px] aspect-[17/22] flex justify-center mr-10">
 
-            <Button onClick={shiftLeft} className="print:hidden absolute left-2 bg-transparent hover:bg-slate-200 bg-none" size={'icon'}> <ChevronLeft color="black"/> </Button>
-            <Button onClick={shiftRight} className="print:hidden absolute right-2 bg-transparent hover:bg-slate-200 bg-none" size={'icon'}> <ChevronRight color="black"/> </Button>
+            <Button disabled={isPending} onClick={shiftLeft} className="print:hidden absolute left-2 bg-transparent hover:bg-slate-200 bg-none" size={'icon'}> <ChevronLeft color="black"/> </Button>
+            <Button disabled={isPending} onClick={shiftRight} className="print:hidden absolute right-2 bg-transparent hover:bg-slate-200 bg-none" size={'icon'}> <ChevronRight color="black"/> </Button>
             
             
             <div ref={container} className={`grid grid-rows-40 grid-cols-8`}>
