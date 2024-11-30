@@ -180,7 +180,7 @@ export default function WeeklyScheduler(){
 
                     {organizationMembers.map(m => <NameLabel key={`Label ${m.id}`} name={`${m.first_name} ${m.last_name}`} onToggle={(enabled) => enabled ? setTrueMembers(prev => new Set(prev).add(`${m.first_name} ${m.last_name}`)) : setTrueMembers(prev => {prev.delete(`${m.first_name} ${m.last_name}`); return new Set(prev)})} />)}
 
-                    {selectedBusinessId && <NameLabelAdd/>}
+                    {selectedBusinessId && <NameLabelAdd onNameAdded={(n) => console.log(n.name)}/>}
                 </div>
                 <div className="flex justify-center py-2 gap-2">
                     <Button disabled={isPending || !selectedBusinessId} type="submit" className="">{isPending ? <Loader2Icon className="animate-spin"/> : 'Generate'}</Button>

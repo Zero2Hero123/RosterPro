@@ -23,7 +23,7 @@ interface NameEntry {
 
 interface Props {
     
-    onNameAdded: (entry: NameEntry) => {}
+    onNameAdded: (entry: NameEntry) => void
 }
 
 const week = ['S','M','T','W','TH','F','SA']
