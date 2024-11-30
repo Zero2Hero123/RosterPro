@@ -10,6 +10,7 @@ import { revalidatePath } from 'next/cache'
 
 import { CreateEmailRequestOptions, CreateEmailResponse, Resend } from 'resend'
 import EmailInvite from '@/components/dashboard-ui/EmailInvite'
+import { NameEntry } from '@/components/shift-table-ui/NameLabelAdd'
 
 const resend = new Resend(process.env.RESEND_KEY)
 
@@ -450,3 +451,19 @@ export async function getThisSunday(){
 }
 
 // AIzaSyDVPUyMRirjbHJxoPhHmYvkDWIk8SnxNfU
+
+export async function addTemp(n: NameEntry,businessId: string){
+
+    const supabase = await createClient()
+
+    const {availability} = n
+
+    const res = await supabase.from('temp_availability').insert({
+        name: n.name,
+        business_id: businessId,
+        ...availability
+    })
+
+
+    console.log(res)
+}

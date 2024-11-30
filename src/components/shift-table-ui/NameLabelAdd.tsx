@@ -1,4 +1,4 @@
-import { ComponentProps, useReducer, useState } from "react";
+import { ComponentProps, useEffect, useReducer, useState } from "react";
 import { Button, ButtonProps } from "../ui/button";
 import { Check, Plus } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
@@ -16,7 +16,7 @@ interface Availability {
     saturday: {from: string,to: string},
 }
 
-interface NameEntry {
+export interface NameEntry {
     name: string,
     availability: Availability
 }
@@ -65,8 +65,6 @@ export default function NameLabelAdd({onNameAdded}: Props){
 
         const newAvail: Availability = {...prev}
 
-        console.log(prev)
-
         
         newAvail[toFullName(day as keyof FullName)] = {
             from: from || prev[toFullName(day as keyof FullName)].from,
@@ -94,7 +92,7 @@ export default function NameLabelAdd({onNameAdded}: Props){
                 <Button className="bg-transparent hover:bg-slate-600 border border-dashed border-white text-white"> <Plus/> </Button>
             </PopoverTrigger>
 
-            <PopoverContent className="bg-gradient-to-tr from-slate-800 to-slate-700 border-none  shadow-black shadow-sm">
+            <PopoverContent className="bg-gradient-to-tr from-slate-800 to-slate-700 shadow-black shadow-sm border-none">
                 <Input onChange={e => setName(e.target.value)} className="text-white bg-slate-900" placeholder="Name"/>
 
 
@@ -104,25 +102,31 @@ export default function NameLabelAdd({onNameAdded}: Props){
                     </TabsList>
 
                     {
-                        week.map(d => <TabsContent className="flex gap-2" key={`CONTENT_${d}`} value={d}>
-                            <Select onValueChange={v => setAvailability({day: d,from: v,to: null})}>
-                                <SelectTrigger className="bg-gradient-to-tr from-slate-800 to-slate-700 text-white border-none">
-                                    <SelectValue placeholder='From'/>
-                                </SelectTrigger>
+                        week.map(d => <TabsContent className="flex justify-around gap-2" key={`CONTENT_${d}`} value={d}>
+                            <div className="flex flex-col">
+                                <span className="text-white">From</span>
+                                <Select onValueChange={v => setAvailability({day: d,from: v,to: null})}>
+                                    <SelectTrigger className="w-[100px] bg-gradient-to-tr from-slate-800 to-slate-700 text-white border-none shadow-black shadow-sm">
+                                        <SelectValue placeholder={parseTime(availability[toFullName(d as keyof FullName)].from) || 'From'}/>
+                                    </SelectTrigger>
 
-                                <SelectContent className="bg-gradient-to-tr from-slate-800 to-slate-700 text-white">
-                                    {times.map(t => <SelectItem key={'select_'+t} value={`${t}`}>{parseTime(`${t}`)}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            <Select onValueChange={v => setAvailability({day: d,from: null,to: v})}>
-                                <SelectTrigger className="bg-gradient-to-tr from-slate-800 to-slate-700 text-white border-none">
-                                    <SelectValue placeholder='To'/>
-                                </SelectTrigger>
+                                    <SelectContent className="bg-gradient-to-tr from-slate-800 to-slate-700 text-white">
+                                        {times.map(t => <SelectItem key={'select_'+t} value={`${t}`}>{parseTime(`${t}`)}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-white">To</span>
+                                <Select onValueChange={v => setAvailability({day: d,from: null,to: v})}>
+                                    <SelectTrigger className="w-[100px] bg-gradient-to-tr from-slate-800 to-slate-700 text-white border-none shadow-black shadow-sm">
+                                        <SelectValue placeholder={parseTime(availability[toFullName(d as keyof FullName)].to) || 'To'}/>
+                                    </SelectTrigger>
 
-                                <SelectContent className="bg-gradient-to-tr from-slate-800 to-slate-700 text-white">
-                                    {times.map(t => <SelectItem key={'select_'+t} value={`${t}`}>{parseTime(`${t}`)}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
+                                    <SelectContent className="bg-gradient-to-tr from-slate-800 to-slate-700 text-white">
+                                        {times.map(t => <SelectItem key={'select_'+t} value={`${t}`}>{parseTime(`${t}`)}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </TabsContent>)
                     }
                 </Tabs>

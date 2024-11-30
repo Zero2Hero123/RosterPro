@@ -2,12 +2,12 @@
 import BusinessLink from "@/components/dashboard-ui/BusinessLink";
 import Cell from "@/components/shift-table-ui/Cell";
 import NameLabel from "@/components/shift-table-ui/NameLabel";
-import NameLabelAdd from "@/components/shift-table-ui/NameLabelAdd";
+import NameLabelAdd, { NameEntry } from "@/components/shift-table-ui/NameLabelAdd";
 import TimeSheetRow from "@/components/shift-table-ui/TimeSheetRow";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { generateShifts, getThisSunday } from "@/utils/actions";
+import { addTemp, generateShifts, getThisSunday } from "@/utils/actions";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { add, addDays, formatDate, sub } from "date-fns"
@@ -115,12 +115,32 @@ export default function WeeklyScheduler(){
             businessqueryid: selectedBusinessId
         }).then((res) => {
             if(res.error) console.error(res.error.message)
+
             setMembers(res.data)
             setTrueMembers(res.data.map((m: any) => `${m.first_name} ${m.last_name}`))
+
+            supabase.from('temp_availability').select().eq('business_id',selectedBusinessId)
+            .then(res => {
+                if(res.error) {
+                    console.error(res.error.message)
+                    return
+                }
+                setTrueMembers(prev => { //! this isnt working idk
+                    
+                    const additionalNames = res.data?.map(p => p.name)
+
+                    return new Set([...prev, ...additionalNames])
+
+                })
+            })
             
         })
 
     },[selectedBusinessId])
+
+    useEffect(() => {
+        console.log(trueMembers)
+    },[trueMembers])
 
 
     function shiftRight(event: MouseEvent<HTMLButtonElement>) {
@@ -180,7 +200,7 @@ export default function WeeklyScheduler(){
 
                     {organizationMembers.map(m => <NameLabel key={`Label ${m.id}`} name={`${m.first_name} ${m.last_name}`} onToggle={(enabled) => enabled ? setTrueMembers(prev => new Set(prev).add(`${m.first_name} ${m.last_name}`)) : setTrueMembers(prev => {prev.delete(`${m.first_name} ${m.last_name}`); return new Set(prev)})} />)}
 
-                    {selectedBusinessId && <NameLabelAdd onNameAdded={(n) => console.log(n.name)}/>}
+                    {selectedBusinessId && <NameLabelAdd onNameAdded={(n) => addTemp(n,selectedBusinessId)}/>}
                 </div>
                 <div className="flex justify-center py-2 gap-2">
                     <Button disabled={isPending || !selectedBusinessId} type="submit" className="">{isPending ? <Loader2Icon className="animate-spin"/> : 'Generate'}</Button>
