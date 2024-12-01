@@ -1,3 +1,4 @@
+import GenerateDemo from "@/components/GenerateDemo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
@@ -18,16 +19,18 @@ export default function Home() {
           <span> is the new Workforce Management tool. It simplifies the process of creating, managing, and tracking employee schedules and tasks, making it easier for organizations to optimize staffing and improve operational efficiency. </span>
         </div>
       </div>
-
       <section className="h-20">
         <Link href='/auth'>
           <Button className="bg-white text-black hover:bg-slate-300 hover:text-black">Try RosterPro</Button>
         </Link>
       </section>
 
-      <video className="w-[90%] shadow-2xl shadow-slate-500 hover:cursor-pointer" loop autoPlay muted preload="none">
-        <source src='/showcase.mp4' type="video/mp4" />
-      </video>
+      <section className="flex justify-center gap-24">
+        <GenerateDemo/>
+        <video className="w-[50%] shadow-2xl shadow-slate-500 hover:cursor-pointer" loop autoPlay muted preload="none">
+          <source src='/showcase.mp4' type="video/mp4" />
+        </video>
+      </section>
       
     </main>
   );

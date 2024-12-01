@@ -69,27 +69,28 @@ export default function RequestCard({t}: Props){
     }
 
     const [isApproved,setApproved] = useState<'APPROVED' | 'AWAITING' | 'DENIED'>(t.approved)
+
+
     
 
     return <>
-    
         <Card className="pt-3 px-1 h-40 relative" key={`TIME_OFF_${t.id}`}>
             {requestee ? <CardTitle className="font-medium flex justify-between pr-3">
-                <span>{requestee.first_name} {requestee.last_name}</span>
-                
-                {requestee.id === t.user_id && <Popover>
-                    <PopoverTrigger asChild>
-                        {requestee.id == t.user_id && <Button size='icon' variant={'ghost'}><Ellipsis/></Button>}
-                    </PopoverTrigger>
-
-                    <PopoverContent className="bg-black bg-opacity-50 border-none w-auto">
-                        <Button onClick={deleteTimeOff} variant={'destructive'}>Delete</Button>
-                    </PopoverContent>
-                </Popover>}
-
-
-                </CardTitle> : <Skeleton className="h-6 m-1"/>}
+            <span>{requestee.first_name} {requestee.last_name}</span>
             
+            {requestee.id === t.user_id && <Popover>
+                <PopoverTrigger asChild>
+                    {requestee.id == t.user_id && <Button size='icon' variant={'ghost'}><Ellipsis/></Button>}
+                </PopoverTrigger>
+
+                <PopoverContent className="bg-black bg-opacity-50 border-none w-auto">
+                    <Button onClick={deleteTimeOff} variant={'destructive'}>Delete</Button>
+                </PopoverContent>
+            </Popover>}
+
+
+            </CardTitle> : <Skeleton className="h-6 m-1"/>}
+        
             <CardContent>{formatDate(t.from,"MMMM dd, yyyy")} to {formatDate(t.to,"MMMM dd, yyyy")}</CardContent>
             <CardFooter className="flex justify-between">
                 {isApproved == 'APPROVED' && <Badge variant={'outline'}><Check size={14}/>Approved</Badge>}
