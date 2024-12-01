@@ -2,13 +2,15 @@
 
 import { Loader2Icon, TriangleIcon } from 'lucide-react'
 import {motion} from 'motion/react'
-import { useEffect, useState, useTransition } from 'react'
+import { ReactNode, useEffect, useState, useTransition } from 'react'
 
 
+interface Props {
+    children: ReactNode
+}
 
 
-
-export default function GenerateDemo(){
+export default function GenerateDemo({children}: Props){
 
     const [isLoading,setIsLoading] = useState<boolean>(false)
 
@@ -43,7 +45,7 @@ export default function GenerateDemo(){
 
     return <>
     
-        <div className='flex flex-col lg:flex-row items-center gap-24'>
+        <div className='flex flex-col lg:flex-row items-center gap-10 justify-center'>
         <motion.div animate={{rotateX: 0, rotateY: -10, rotateZ: -5}} className='flex border border-gray-700 bg-gray-950 rounded-md h-44 w-72 flex-col p-1'>
 
             <span className='text-center'>Availabilty</span>
@@ -59,12 +61,14 @@ export default function GenerateDemo(){
             </div>
         </motion.div>
 
+        {children}
+
 
         <motion.div animate={{rotateY: 0, rotateZ: 3}} className='flex p-2 gap-2 flex-col bg-white w-[15vw] min-w-[275px]  h-[50vh] min-h-[400px]'>
             <span className='text-black text-center'>Schedule</span>
             {isLoading ? <div className='w-full grow flex justify-center items-center'> <Loader2Icon className='animate-spin' color='gray' size={'100'}/> </div> : <>
             
-                <motion.div className={`grow w-${lengths[Math.floor(Math.random() * lengths.length)]} bg-gradient-to-tr from-slate-400 to-slate-300 rounded-am rounded-sm`}></motion.div>
+            <motion.div initial={{opacity: 0, translateY: -10}} animate={{opacity: 1, translateY: 0}} className={`grow w-${lengths[Math.floor(Math.random() * lengths.length)]} bg-gradient-to-tr ${Math.random() > 0.5 ? 'from-slate-400' : 'from-slate-600'} to-slate-300 rounded-am rounded-sm`}></motion.div>
             <motion.div initial={{opacity: 0, translateY: -10}} animate={{opacity: 1, translateY: 0}} className={`grow w-${lengths[Math.floor(Math.random() * lengths.length)]} bg-gradient-to-tr ${Math.random() > 0.5 ? 'from-slate-400' : 'from-slate-600'} to-slate-300 rounded-am rounded-sm`}></motion.div>
             <motion.div initial={{opacity: 0, translateY: -10}} animate={{opacity: 1, translateY: 0}} className={`grow w-${lengths[Math.floor(Math.random() * lengths.length)]} bg-gradient-to-tr ${Math.random() > 0.5 ? 'from-slate-400' : 'from-slate-600'} to-slate-300 rounded-am rounded-sm`}></motion.div>
             <motion.div initial={{opacity: 0, translateY: -10}} animate={{opacity: 1, translateY: 0}} className={`grow w-${lengths[Math.floor(Math.random() * lengths.length)]} bg-gradient-to-tr ${Math.random() > 0.5 ? 'from-slate-400' : 'from-slate-600'} to-slate-300 rounded-am rounded-sm`}></motion.div>
