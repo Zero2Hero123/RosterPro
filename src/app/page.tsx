@@ -25,11 +25,11 @@ export default function Home() {
         </Link>
       </section>
 
-      <section className="flex justify-center gap-24">
-        <GenerateDemo/>
-        <video className="w-[50%] shadow-2xl shadow-slate-500 hover:cursor-pointer" loop autoPlay muted preload="none">
+      <section className="flex flex-col lg:flex-row items-center justify-center gap-24">
+        <video className="w-[50%] min-w-[370px] shadow-2xl shadow-slate-500 hover:cursor-pointer" loop autoPlay muted preload="none">
           <source src='/showcase.mp4' type="video/mp4" />
         </video>
+        <GenerateDemo/>
       </section>
       
     </main>

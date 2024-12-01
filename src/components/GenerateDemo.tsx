@@ -43,7 +43,7 @@ export default function GenerateDemo(){
 
     return <>
     
-        <div className='flex gap-24'>
+        <div className='flex flex-col lg:flex-row items-center gap-24'>
         <motion.div animate={{rotateX: 0, rotateY: -10, rotateZ: -5}} className='flex border border-gray-700 bg-gray-950 rounded-md h-44 w-72 flex-col p-1'>
 
             <span className='text-center'>Availabilty</span>
@@ -60,7 +60,7 @@ export default function GenerateDemo(){
         </motion.div>
 
 
-        <motion.div animate={{rotateY: 0, rotateZ: 3}} className='flex p-2 gap-2 flex-col bg-white w-[15vw] min-w-[230px] h-[50vh] min-h-[400px]'>
+        <motion.div animate={{rotateY: 0, rotateZ: 3}} className='flex p-2 gap-2 flex-col bg-white w-[15vw] min-w-[275px]  h-[50vh] min-h-[400px]'>
             <span className='text-black text-center'>Schedule</span>
             {isLoading ? <div className='w-full grow flex justify-center items-center'> <Loader2Icon className='animate-spin' color='gray' size={'100'}/> </div> : <>
             
