@@ -42,7 +42,6 @@ export default function WeeklyScheduler(){
 
     const [organizationMembers,setMembers]= useState<any[]>([])
     const [trueMembers,setTrueMembers] = useState<Set<any>>(new Set()) // organization members who should be included in the timesheet
-
     const rosterChatInput = useRef<HTMLInputElement>(null)
 
     const [data,generateShiftAction,isPending] = useActionState(generateShifts,{generated: false, schedule: null})
@@ -119,20 +118,6 @@ export default function WeeklyScheduler(){
             setMembers(res.data)
             setTrueMembers(res.data.map((m: any) => `${m.first_name} ${m.last_name}`))
 
-            supabase.from('temp_availability').select().eq('business_id',selectedBusinessId)
-            .then(res => {
-                if(res.error) {
-                    console.error(res.error.message)
-                    return
-                }
-                setTrueMembers(prev => { //! this isnt working idk
-                    
-                    const additionalNames = res.data?.map(p => p.name)
-
-                    return new Set([...prev, ...additionalNames])
-
-                })
-            })
             
         })
 
@@ -196,11 +181,12 @@ export default function WeeklyScheduler(){
                         <span>No Organization Selected</span>
                     </div>
                 }
+                {selectedBusinessId && <span className="text-center">Employees</span>}
                 <div className="flex gap-3 grow flex-wrap">
 
-                    {organizationMembers.map(m => <NameLabel key={`Label ${m.id}`} name={`${m.first_name} ${m.last_name}`} onToggle={(enabled) => enabled ? setTrueMembers(prev => new Set(prev).add(`${m.first_name} ${m.last_name}`)) : setTrueMembers(prev => {prev.delete(`${m.first_name} ${m.last_name}`); return new Set(prev)})} />)}
-
-                    {selectedBusinessId && <NameLabelAdd onNameAdded={(n) => addTemp(n,selectedBusinessId)}/>}
+                    {organizationMembers.map(m => <NameLabel businessId={selectedBusinessId} userId={m.id} key={`Label ${m.id}`} name={`${m.first_name} ${m.last_name}`} onToggle={(enabled) => enabled ? setTrueMembers(prev => new Set(prev).add(`${m.first_name} ${m.last_name}`)) : setTrueMembers(prev => {prev.delete(`${m.first_name} ${m.last_name}`); return new Set(prev)})} />)}
+                    
+                    {/* {selectedBusinessId && <NameLabelAdd onNameAdded={(n) => addTemp(n,selectedBusinessId)}/>} */}
                 </div>
                 <div className="flex justify-center py-2 gap-2">
                     <Button disabled={isPending || !selectedBusinessId} type="submit" className="">{isPending ? <Loader2Icon className="animate-spin"/> : 'Generate'}</Button>
