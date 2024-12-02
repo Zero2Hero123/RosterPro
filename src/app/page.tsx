@@ -28,7 +28,7 @@ export default function Home() {
       <section className="">
         <GenerateDemo>
           <video className="w-[50%] min-w-[370px] shadow-2xl shadow-slate-500 hover:cursor-pointer" loop autoPlay muted preload="none">
-            <source src='/showcase.mp4' type="video/mp4" />
+            <source src='/showcase2.0.mp4' type="video/mp4" />
           </video>
         </GenerateDemo>
       </section>
