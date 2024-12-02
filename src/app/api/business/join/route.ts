@@ -31,9 +31,9 @@ export async function GET(req: NextRequest) {
     })
 
     if(error){
-        redirect(`${req.nextUrl.host}/business/${businessId}`)
+        redirect(`/business/${businessId}`)
     }
 
 
-    redirect(`${req.nextUrl.host}/business/${businessId}`)
+    redirect(`/business/${businessId}`)
 }
