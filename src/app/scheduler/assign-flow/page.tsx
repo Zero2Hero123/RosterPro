@@ -24,6 +24,8 @@ import { CalendarIcon, LoaderCircle, Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState, useTransition } from "react";
 import { DateRange } from "react-day-picker";
 
+import { motion } from 'motion/react'
+
 type Jobs = Record<string,number>
 
 export type PercentagesMap = Record<string,Jobs>
@@ -350,7 +352,7 @@ export default function Scheduler(){
     return (<>
     
         <main>
-            <span className="flex justify-center text-3xl font-medium print:hidden">Person-Job Scheduler</span>
+            <motion.span transition={{type: 'spring'}} initial={{letterSpacing: '12px'}} animate={{letterSpacing: '0px'}} className="flex justify-center text-4xl font-medium print:hidden italic">Assign Flow</motion.span>
             
             <header className="flex justify-center gap-2 flex-wrap print:hidden">
                 <ParamController title="People">

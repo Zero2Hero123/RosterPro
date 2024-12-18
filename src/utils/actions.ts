@@ -125,7 +125,7 @@ export default async function generate(args: GenerateProps): Promise<GenerateRes
     const prompt = createPrompt(args)
 
     const res = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4-turbo',
         response_format: {type: 'json_object'},
         messages: [
             {role: 'system', content: systemRole},

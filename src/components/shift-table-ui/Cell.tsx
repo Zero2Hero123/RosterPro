@@ -18,6 +18,7 @@ const Cell: React.FC<Props> = ({children}) => {
             if(userInput.current){
                 userInput.current.focus()
             }
+
         }
 
         if(userInput.current){

@@ -15,9 +15,14 @@ import { Building2Icon, ChevronLeft, ChevronRight, ChevronsUpDown, Loader2Icon, 
 import { Span } from "next/dist/trace";
 import { MouseEvent, useActionState, useEffect, useRef, useState } from "react";
 
+import { AnimatePresence, motion } from 'motion/react'
+
 import { createSwapy } from 'swapy'
 
 export const dynamic = 'force-dynamic';
+
+
+const loadingStates = ['Just a sec','Almost..','Loading..☕️','Cooking..️‍🔥']
 
 
 export default function WeeklyScheduler(){
@@ -64,7 +69,7 @@ export default function WeeklyScheduler(){
 
     useEffect(() => {
         setSchedule(data.schedule)
-    },[data])
+    },[isPending])
 
     useEffect(() => {
         const days: Date[] = []
@@ -171,7 +176,7 @@ export default function WeeklyScheduler(){
             <form action={generateShiftAction} className="flex flex-col gap-2 p-4">
                 <div className="flex justify-center">
                     <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                        <DropdownMenuTrigger disabled={isPending} asChild>
                             <Button className="hidden grow md:flex justify-around items-center border border-gray-500 bg-slate-700 hover:bg-slate-800"> <span className="grow text-center">{selectedBusinessId ? <BusinessLink businessId={selectedBusinessId} asLink={false} /> : 'Select an Organization'}</span> <ChevronsUpDown size={'18'}/> </Button>
                         </DropdownMenuTrigger>
 
@@ -198,8 +203,8 @@ export default function WeeklyScheduler(){
                     {/* {selectedBusinessId && <NameLabelAdd onNameAdded={(n) => addTemp(n,selectedBusinessId)}/>} */}
                 </div>
                 <div className="flex justify-center py-2 gap-2">
-                    <Button disabled={isPending || !selectedBusinessId} type="submit" className="">{isPending ? <Loader2Icon className="animate-spin"/> : 'Generate'}</Button>
-                    <Button onClick={() => window.print()} type='button' disabled={isPending || !data.generated} size={'icon'}> <Printer/> </Button>
+                    <motion.button whileHover={{scale: 1.1}} whileTap={{scale: .9}} disabled={isPending || !selectedBusinessId} type="submit" className={`bg-slate-900 flex justify-between items-center hover:cursor-pointer rounded-md p-1 disabled:opacity-50 ${isPending && 'w-36'}`}>{isPending ? <div className="flex justify-between grow overflow-hidden"><Loader2Icon className="animate-spin"/> <LoadingState/> </div> : 'Generate'}</motion.button>
+                    <motion.button whileHover={{scale: 1.1}} whileTap={{scale: .9}} onClick={() => window.print()} className="bg-slate-900 disabled:opacity-50 hover:cursor-pointer rounded-md p-1 flex justify-center items-center" type='button' disabled={isPending || !data.generated}> <Printer/> </motion.button>
                 </div>
                 <Input readOnly name={`names`} value={[...trueMembers].join(',')} className="hidden" />
                 <Input readOnly name={`businessId`} value={selectedBusinessId ?? ''} className="hidden" />
@@ -247,4 +252,25 @@ export default function WeeklyScheduler(){
     </main>
     
     </>
+}
+
+function LoadingState(){
+
+    const [curr,setCurr] = useState(0);
+
+    const increment = () => {
+        setCurr(prev => prev == loadingStates.length-1 ? 0 : prev+1)
+    }
+
+    useEffect(() => {
+
+        const loop = setInterval(increment,3000)
+
+        return () => {
+            clearInterval(loop)
+        }
+    },[])
+
+    return <motion.div transition={{repeat: Infinity, times: [0,.1,1,1.8],repeatDelay:1, duration:2}} animate={{translateY: [100,0,0,-100], scale: [0,1,1,0]}} className="flex grow justify-center">{loadingStates[curr]}</motion.div>
+
 }
