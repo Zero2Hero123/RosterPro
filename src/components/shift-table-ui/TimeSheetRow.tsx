@@ -37,14 +37,14 @@ export default function TimeSheetRow({personName,avail,asPlaceHolder = false}: P
 
         <TooltipProvider>
 
-            <Cell>{first} {last.substring(0,1)}</Cell>
-            <Cell>{avail[0].leave ? <TimeOffTag/> : `${parseTime(avail[0].from)} - ${parseTime(avail[0].to)}`}</Cell>   {/*Sunday*/}
-            <Cell>{avail[1].leave ? <TimeOffTag/> : `${parseTime(avail[1].from)} - ${parseTime(avail[1].to)}`}</Cell>   {/*Monday*/}
-            <Cell>{avail[2].leave ? <TimeOffTag/> : `${parseTime(avail[2].from)} - ${parseTime(avail[2].to)}`}</Cell>   {/*Tuesday*/}
-            <Cell>{avail[3].leave ? <TimeOffTag/> : `${parseTime(avail[3].from)} - ${parseTime(avail[3].to)}`}</Cell>   {/*Wednesday*/}
-            <Cell>{avail[4].leave ? <TimeOffTag/> : `${parseTime(avail[4].from)} - ${parseTime(avail[4].to)}`}</Cell>   {/*Thursday*/}
-            <Cell>{avail[5].leave ? <TimeOffTag/> : `${parseTime(avail[5].from)} - ${parseTime(avail[5].to)}`}</Cell>   {/*Friday*/} 
-            <Cell>{avail[6].leave ? <TimeOffTag/> : `${parseTime(avail[6].from)} - ${parseTime(avail[6].to)}`}</Cell>  {/*Saturday*/}
+            <Cell><span>{first} {last.substring(0,1)}</span></Cell>
+            <Cell><span>{avail[0].leave ? <TimeOffTag/> : `${parseTime(avail[0].from)} - ${parseTime(avail[0].to)}`}</span></Cell>   {/*Sunday*/}
+            <Cell><span>{avail[1].leave ? <TimeOffTag/> : `${parseTime(avail[1].from)} - ${parseTime(avail[1].to)}`}</span></Cell>   {/*Monday*/}
+            <Cell><span>{avail[2].leave ? <TimeOffTag/> : `${parseTime(avail[2].from)} - ${parseTime(avail[2].to)}`}</span></Cell>   {/*Tuesday*/}
+            <Cell><span>{avail[3].leave ? <TimeOffTag/> : `${parseTime(avail[3].from)} - ${parseTime(avail[3].to)}`}</span></Cell>   {/*Wednesday*/}
+            <Cell><span>{avail[4].leave ? <TimeOffTag/> : `${parseTime(avail[4].from)} - ${parseTime(avail[4].to)}`}</span></Cell>   {/*Thursday*/}
+            <Cell><span>{avail[5].leave ? <TimeOffTag/> : `${parseTime(avail[5].from)} - ${parseTime(avail[5].to)}`}</span></Cell>   {/*Friday*/} 
+            <Cell><span>{avail[6].leave ? <TimeOffTag/> : `${parseTime(avail[6].from)} - ${parseTime(avail[6].to)}`}</span></Cell>  {/*Saturday*/}
 
         </TooltipProvider>
     </>

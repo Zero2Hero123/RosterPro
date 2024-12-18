@@ -17,6 +17,8 @@ import { MouseEvent, useActionState, useEffect, useRef, useState } from "react";
 
 import { createSwapy } from 'swapy'
 
+export const dynamic = 'force-dynamic';
+
 
 export default function WeeklyScheduler(){
 
@@ -45,6 +47,9 @@ export default function WeeklyScheduler(){
     const rosterChatInput = useRef<HTMLInputElement>(null)
 
     const [data,generateShiftAction,isPending] = useActionState(generateShifts,{generated: false, schedule: null})
+
+    const [currSchedule,setSchedule] = useState(data.schedule)
+
     const arr = new Array(40)
     arr.fill(1)
 
@@ -56,6 +61,10 @@ export default function WeeklyScheduler(){
             .then(res => setUser(res.data.user))
 
     },[])
+
+    useEffect(() => {
+        setSchedule(data.schedule)
+    },[data])
 
     useEffect(() => {
         const days: Date[] = []

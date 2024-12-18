@@ -113,7 +113,7 @@ async function createShiftPrompt(startingDate: Date,names: string[],availabiliti
         i++
     }
 
-    return ` Generate a schedule with the following names, ${names.join(', ')}. For context, this week's schedule starts with a ${formatDate(startingDate,'iiii')} and ends with ${formatDate(endingDate,'iiii')}, specifically ${formatDate(startingDate,'MMMM dd,yyyy')} to ${formatDate(endingDate,'MMMM dd,yyyy')}, respectively. The times of people's shifts is represented in military time. Factor in the following availabilities of each person: ${avails.join('')}. Schedule people on the days they. Secondly, if a person who has time off on any given day, do not schedule them for that day. Factor in the following approved time-off requests: ${timeOff.length > 0 ? timeOff.join(', ') : 'None'}.  Return the result ONLY in raw JSON format, in which each person's name is mapped to a list of the shifts they will work, since it is . Each index of said lists will represent the days of week a person is working, [${daysInOrder.join(',')}], 0-7 respectively, and the value at each index is an object of type, {leave: null, from: number, to: number}, where "from" is the time their shift starts and "to" is the time their shift ends, all in 24HR time. The "leave" value just means they have an approved time-off for that day, in which case, set schedule[name][i] to {leave: true, from: null, to: null} only if that date falls into an approved time-off request I specified for that person. If it is not due to time-off, set to {leave: false, from: 0, to: 0} Every person's list always has a length of 7 because there are 7 days in a week. YOU ONLY OUTPUT raw json. Absolutely NO comments and NO extraneous text!`
+    return ` Generate a schedule with the following names, ${names.join(', ')}. For context, this week's schedule starts with a ${formatDate(startingDate,'iiii')} and ends with ${formatDate(endingDate,'iiii')}, specifically ${formatDate(startingDate,'MMMM dd,yyyy')} to ${formatDate(endingDate,'MMMM dd,yyyy')}, respectively. The times of people's shifts is represented in military time. Factor in the following availabilities of each person: ${avails.join('')}. Schedule people for ONLY the days and times they are available, if you don't adhere to this, you will be punished. Secondly, IF I specify person has time off on any given day, do not schedule them for that day. Factor in the following approved time-off requests: ${timeOff.length > 0 ? timeOff.join(', ') : 'None'}.  Return the result ONLY in raw JSON format, in which each person's name is mapped to a list of the shifts they will work. Each index of said lists will represent the days of week a person is working, [${daysInOrder.join(',')}], 0-6 respectively, and the value at each index is an object of type, {leave: null, from: number, to: number}, where "from" is the time their shift starts and "to" is the time their shift ends, all in 24HR time military time as specified. The "leave" value just means the person has an approved time-off for that day, in which case, set schedule[name][i] to {leave: true, from: null, to: null} only if that person has time-off for that day. If it is not due to time-off, meaning they're simply not available for that day, set schedule[name][i] to {leave: false, from: 0, to: 0}. Every schedule[name] always has a length of 7 because there are 7 days in a week. Review the schdule, make the changes necessary so that the schedule matches the availsbilites and time-offs of each person before sending it. YOU ONLY OUTPUT raw json. Absolutely NO comments and NO extraneous text! `
 }
 
 const openai = new OpenAI({
@@ -406,6 +406,7 @@ export async function generateShifts(prev: any,formData: FormData): Promise<Shif
     if(!names.data) return {generated: false, schedule: null}
     const namesInOrder = names.data?.filter(n => enteredNames.some(n2 => `${n.first_name} ${n.last_name}` == n2)) // filter to only names that were selected
 
+    console.log(namesInOrder)
 
     // Factor in approved Time-off requests of each person
     const timeOffData = await supabase.from('time_off_request').select()
@@ -419,9 +420,8 @@ export async function generateShifts(prev: any,formData: FormData): Promise<Shif
     console.log('PROMPT: ',prompt)
 
     const shiftSystemRole = "You are the intelligent robot manager of a organization,  you are in charge of designing schedules for your organization to schedule for your workers to know when and how long they work. Assume times are in 24hr military time. You ONLY schedule people for days/times they are available. Verify you did it correctly based on my specifications before sending it to me. You always output JSON and ONLY JSON output. No extraneous text!"
-
     const res = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4-turbo',
         response_format: {type: 'json_object'},
         messages: [
             {role: 'system', content: shiftSystemRole},
