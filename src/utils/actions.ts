@@ -389,14 +389,12 @@ export async function generateShifts(prev: any,formData: FormData): Promise<Shif
     const startingDay = new Date(formData.get('startDate') as string)
 
 
-
+    console.time('Generating')
 
     // Factor in the availability of each person
     const availabilities = await supabase.from('availability')
         .select()
         .eq('business_id',businessId).order('user_id') // get the corresponding availabilities in order of their user_ids (user's id)
-
-    console.log(availabilities)
     if(availabilities.count == 0){
         return {generated: false, schedule: null}
     }
@@ -432,6 +430,7 @@ export async function generateShifts(prev: any,formData: FormData): Promise<Shif
     const timeSheet = JSON.parse(res.choices[0].message.content as string)
 
     console.log(timeSheet)
+    console.timeEnd('Generating')
 
     return {
         schedule: timeSheet as ShiftSchedule,
