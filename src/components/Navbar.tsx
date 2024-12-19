@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader } from "./ui/card";
 import ServiceDisplayCard from "./ServiceDisplayCard";
 import BusinessLink from "./dashboard-ui/BusinessLink";
 import { Building2, ChevronsRight } from "lucide-react";
+import MailBtn from "./mail-notif-ui/MailBtn";
 
 const toolsAndServices = [
     {
@@ -68,6 +69,7 @@ const Navbar: React.FC = async () => {
             </div>
 
             {myProfile ? <div className="flex items-center">
+                <MailBtn/>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button className="flex justify-around items-center border border-gray-500 bg-black hover:bg-slate-950 gap-2"> <span className="grow text-center hidden md:inline"> Dashboard </span> <Building2 />  </Button>
