@@ -68,7 +68,7 @@ const Navbar: React.FC = async () => {
                 </NavigationMenu>
             </div>
 
-            {myProfile ? <div className="flex items-center">
+            {myProfile ? <div className="flex items-center gap-2">
                 <MailBtn/>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
