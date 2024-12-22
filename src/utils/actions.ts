@@ -442,9 +442,16 @@ export async function getThisSunday(){
 
     let sunday = today
 
-    while(sunday.getDay() != 0){
-        console.log(sunday.getDay())
-        sunday = addDays(sunday,-1)
+    if(today.getDay() < 4){
+        while(sunday.getDay() != 0){
+            console.log(sunday.getDay())
+            sunday = addDays(sunday,-1)
+        }
+    } else if(today.getDay() >= 4){
+        while(sunday.getDay() != 0){
+            console.log(sunday.getDay())
+            sunday = addDays(sunday,1)
+        }
     }
 
     return sunday;
