@@ -454,6 +454,8 @@ export async function getThisSunday(){
         }
     }
 
+    console.log(sunday.getDate())
+
     return sunday;
 }
 
